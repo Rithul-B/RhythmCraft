@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Newsreader, Inter, Geist_Mono } from "next/font/google";
 import "./globals.css";
 
@@ -20,9 +20,35 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
+const SITE_URL = "https://rhythmcraft.vercel.app";
+const DESCRIPTION =
+  "A meter-aware writing app for poets and lyricists. Live syllable counts, rhyme schemes, and tone-filtered rhyme search in a distraction-free canvas.";
+
 export const metadata: Metadata = {
+  metadataBase: new URL(SITE_URL),
   title: "RhythmCraft",
-  description: "A meter-aware writing app for poets and lyricists",
+  description: DESCRIPTION,
+  applicationName: "RhythmCraft",
+  keywords: ["poetry", "songwriting", "rhyme", "meter", "syllables", "lyrics"],
+  openGraph: {
+    type: "website",
+    url: SITE_URL,
+    siteName: "RhythmCraft",
+    title: "RhythmCraft",
+    description: DESCRIPTION,
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "RhythmCraft",
+    description: DESCRIPTION,
+  },
+};
+
+export const viewport: Viewport = {
+  themeColor: [
+    { media: "(prefers-color-scheme: light)", color: "#F7F5F0" },
+    { media: "(prefers-color-scheme: dark)", color: "#121214" },
+  ],
 };
 
 export default function RootLayout({

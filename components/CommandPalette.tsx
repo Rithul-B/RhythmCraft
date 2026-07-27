@@ -40,6 +40,9 @@ export function CommandPalette({
       <div
         className="relative z-10 flex max-h-[75vh] w-full max-w-xl flex-col overflow-hidden rounded-2xl border border-[var(--glass-border)] bg-[var(--glass-bg)] font-[family-name:var(--font-ui)] shadow-2xl backdrop-blur-xl"
         style={{ boxShadow: "var(--drawer-shadow)" }}
+        role="dialog"
+        aria-modal
+        aria-label="Search rhymes and synonyms"
         data-testid="command-palette"
       >
         <div className="flex items-center justify-between border-b border-[var(--divider)] px-4 py-3">
@@ -49,6 +52,7 @@ export function CommandPalette({
           <button
             type="button"
             onClick={onClose}
+            aria-label="Close search"
             className="rounded-full p-1.5 text-[var(--muted)] hover:bg-[var(--surface-raised)]/60"
           >
             <X className="h-4 w-4" />

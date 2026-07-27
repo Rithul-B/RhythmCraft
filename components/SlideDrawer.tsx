@@ -8,6 +8,7 @@ interface SlideDrawerProps {
   onClose: () => void;
   children: React.ReactNode;
   width?: string;
+  label: string;
 }
 
 export function SlideDrawer({
@@ -16,6 +17,7 @@ export function SlideDrawer({
   onClose,
   children,
   width,
+  label,
 }: SlideDrawerProps) {
   const drawerWidth = width ?? (side === "left" ? "280px" : "360px");
 
@@ -48,8 +50,11 @@ export function SlideDrawer({
           boxShadow: "var(--drawer-shadow)",
         }}
         role="dialog"
+        aria-label={label}
         aria-modal={open}
-        aria-hidden={!open}
+        // The drawer stays mounted so it can animate, so it must be inert while closed;
+        // aria-hidden alone would still leave its controls in the tab order.
+        inert={!open}
       >
         {children}
       </div>

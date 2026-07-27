@@ -62,6 +62,7 @@ export function InspectorDrawer({
         <button
           type="button"
           onClick={onClose}
+          aria-label="Close inspector"
           className="rounded-full p-1.5 text-[var(--muted)] transition-all duration-300 hover:bg-[var(--surface-raised)]/60"
         >
           <X className="h-4 w-4" />

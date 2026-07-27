@@ -121,6 +121,7 @@ export function WritingWorkspace() {
         side="left"
         open={ui.notebookOpen}
         onClose={() => ui.setNotebookOpen(false)}
+        label="Notebooks"
       >
         <NotebookPanel
           notebooks={notebooks}
@@ -142,6 +143,7 @@ export function WritingWorkspace() {
         open={ui.inspectorOpen}
         onClose={() => ui.setInspectorOpen(false)}
         width="360px"
+        label="Inspector"
       >
         <InspectorDrawer
           analysis={analysis}

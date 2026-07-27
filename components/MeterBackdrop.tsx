@@ -1,7 +1,6 @@
 "use client";
 
 import { getBrokenWordIndices, type MeterBreak } from "@/lib/meterDiagnostics";
-import { getWordsFromLine } from "@/lib/syllables";
 import { editorTextStyles } from "./editorStyles";
 
 interface MeterBackdropProps {
@@ -28,31 +27,36 @@ export function MeterBackdrop({
         className="whitespace-pre-wrap break-words font-[family-name:var(--font-editor)]"
       >
         {lines.map((line, lineIndex) => {
-          const words = getWordsFromLine(line);
           const brokenIndices = getBrokenWordIndices(meterDiagnostics, lineIndex);
-          const showLine =
-            showAllBreaks || lineIndex === activeLineIndex;
+          const showLine = showAllBreaks || lineIndex === activeLineIndex;
 
-          if (words.length === 0) {
+          if (!line.trim()) {
             return <div key={lineIndex}>&nbsp;</div>;
           }
 
+          // Split on whitespace while keeping the separators, so indentation and repeated
+          // spaces survive verbatim. Reconstructing from words alone shifts the underlines.
+          let wordIndex = -1;
+
           return (
             <div key={lineIndex}>
-              {words.map((word, wordIndex) => {
+              {line.split(/(\s+)/).map((segment, segmentIndex) => {
+                if (!segment) return null;
+                if (!segment.trim()) return <span key={segmentIndex}>{segment}</span>;
+
+                wordIndex += 1;
                 const isBroken = showLine && brokenIndices.has(wordIndex);
+
                 return (
-                  <span key={wordIndex}>
-                    <span
-                      className={
-                        isBroken
-                          ? "text-transparent underline decoration-[#C4A882]/60 decoration-2 underline-offset-[6px]"
-                          : "text-transparent"
-                      }
-                    >
-                      {word}
-                    </span>
-                    {wordIndex < words.length - 1 ? " " : ""}
+                  <span
+                    key={segmentIndex}
+                    className={
+                      isBroken
+                        ? "text-transparent underline decoration-[#C4A882]/60 decoration-2 underline-offset-[6px]"
+                        : "text-transparent"
+                    }
+                  >
+                    {segment}
                   </span>
                 );
               })}
