@@ -1,5 +1,5 @@
 import type { DatamuseWord } from "./datamuse";
-import { scoreWordForTone, TONE_DEFINITIONS, type TonePreset } from "./toneLexicon";
+import { TONE_DEFINITIONS, type TonePreset } from "./toneLexicon";
 
 const TONE_MOCK_WORDS: Record<string, DatamuseWord[]> = {
   melancholic: [

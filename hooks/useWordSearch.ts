@@ -7,16 +7,22 @@ import {
 } from "@/lib/stress";
 import { scoreWordForTone, type TonePreset } from "@/lib/toneLexicon";
 
+const EMPTY_RESULTS: WordResult[] = [];
+
 export function useWordSearch(debounceMs = 300) {
   const [query, setQuery] = useState("");
   const [debouncedQuery, setDebouncedQuery] = useState("");
   const [syllableFilters, setSyllableFilters] = useState<number[]>([]);
   const [footPreset, setFootPreset] = useState<FootPreset>("any");
   const [tone, setTone] = useState<TonePreset>("none");
-  const [results, setResults] = useState<WordResult[]>([]);
+  const [fetchedResults, setResults] = useState<WordResult[]>([]);
   const [loading, setLoading] = useState(false);
-  const [isMock, setIsMock] = useState(false);
+  const [fetchedIsMock, setIsMock] = useState(false);
   const [copiedWord, setCopiedWord] = useState<string | null>(null);
+
+  // Derived rather than cleared in an effect, so an emptied query blanks the list immediately.
+  const results = debouncedQuery ? fetchedResults : EMPTY_RESULTS;
+  const isMock = debouncedQuery ? fetchedIsMock : false;
 
   useEffect(() => {
     const timer = setTimeout(() => setDebouncedQuery(query.trim()), debounceMs);
@@ -24,11 +30,7 @@ export function useWordSearch(debounceMs = 300) {
   }, [query, debounceMs]);
 
   useEffect(() => {
-    if (!debouncedQuery) {
-      setResults([]);
-      setIsMock(false);
-      return;
-    }
+    if (!debouncedQuery) return;
 
     const controller = new AbortController();
 

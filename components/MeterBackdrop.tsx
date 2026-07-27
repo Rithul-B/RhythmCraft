@@ -22,7 +22,11 @@ export function MeterBackdrop({
       className="pointer-events-none absolute inset-0 overflow-hidden"
       aria-hidden
     >
-      <div style={editorTextStyles} className="whitespace-pre-wrap break-words">
+      {/* Must mirror the textarea's font and metrics exactly, or the underlines drift off their words. */}
+      <div
+        style={editorTextStyles}
+        className="whitespace-pre-wrap break-words font-[family-name:var(--font-editor)]"
+      >
         {lines.map((line, lineIndex) => {
           const words = getWordsFromLine(line);
           const brokenIndices = getBrokenWordIndices(meterDiagnostics, lineIndex);
@@ -42,7 +46,7 @@ export function MeterBackdrop({
                     <span
                       className={
                         isBroken
-                          ? "underline decoration-[#C4A882]/60 decoration-2 underline-offset-[6px]"
+                          ? "text-transparent underline decoration-[#C4A882]/60 decoration-2 underline-offset-[6px]"
                           : "text-transparent"
                       }
                     >

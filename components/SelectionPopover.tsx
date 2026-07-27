@@ -4,6 +4,8 @@ import { useEffect, useState } from "react";
 import { countWordSyllables } from "@/lib/syllables";
 import type { WordResult } from "@/lib/datamuse";
 
+const EMPTY_RESULTS: WordResult[] = [];
+
 interface SelectionPopoverProps {
   word: string | null;
   anchor: { top: number; left: number } | null;
@@ -17,30 +19,32 @@ export function SelectionPopover({
   onSearchMore,
   onClose,
 }: SelectionPopoverProps) {
-  const [results, setResults] = useState<WordResult[]>([]);
-  const [loading, setLoading] = useState(false);
+  // Results are stored with the word they belong to, so both the stale-result flash and a
+  // superseded request clearing the spinner are impossible by construction.
+  const [fetched, setFetched] = useState<{ word: string; items: WordResult[] } | null>(null);
 
   useEffect(() => {
-    if (!word) {
-      setResults([]);
-      return;
-    }
+    if (!word) return;
 
     const controller = new AbortController();
-    setLoading(true);
 
     fetch(`/api/words?q=${encodeURIComponent(word)}&max=10`, {
       signal: controller.signal,
     })
       .then((r) => r.json())
       .then((data: { words: WordResult[] }) => {
-        setResults((data.words ?? []).slice(0, 5));
+        setFetched({ word, items: (data.words ?? []).slice(0, 5) });
       })
-      .catch(() => setResults([]))
-      .finally(() => setLoading(false));
+      .catch(() => {
+        if (!controller.signal.aborted) setFetched({ word, items: [] });
+      });
 
     return () => controller.abort();
   }, [word]);
+
+  const hasResultsForWord = fetched?.word === word;
+  const results = hasResultsForWord ? fetched.items : EMPTY_RESULTS;
+  const loading = word !== null && !hasResultsForWord;
 
   if (!word || !anchor) return null;
 

@@ -6,14 +6,13 @@ export interface RhymeSchemeResult {
   groups: Map<string, number[]>;
 }
 
-const VOWEL_GROUPS: Record<string, string> = {
-  a: "A",
-  e: "E",
-  i: "I",
-  o: "O",
-  u: "U",
-  y: "Y",
-};
+const VOWELS = "aeiouy";
+
+const hasVowel = (s: string) => [...s].some((c) => VOWELS.includes(c));
+
+// A leading "y" is a consonant ("you"), everywhere else it acts as a vowel ("pity").
+const isVowelAt = (s: string, i: number) =>
+  VOWELS.includes(s[i]) && !(s[i] === "y" && i === 0);
 
 function getEndWord(line: string): string {
   const words = getWordsFromLine(line);
@@ -21,27 +20,36 @@ function getEndWord(line: string): string {
   return words[words.length - 1].toLowerCase().replace(/[^a-z']/g, "");
 }
 
+/**
+ * Words rhyme on everything from their last stressed vowel onward, so the key deliberately
+ * excludes the consonant preceding that vowel — that is the part a rhyme must differ on.
+ */
 function getRhymeKey(word: string): string {
   if (!word) return "";
   const cleaned = word.toLowerCase().replace(/[^a-z]/g, "");
   if (!cleaned) return "";
 
-  let vowelIndex = -1;
-  for (let i = cleaned.length - 1; i >= 0; i--) {
-    if ("aeiouy".includes(cleaned[i])) {
-      vowelIndex = i;
-      break;
-    }
-  }
+  // A silent trailing "e" belongs to the previous vowel's sound: "fade" rhymes on "ade", not "e".
+  const hasSilentE =
+    cleaned.length > 2 &&
+    cleaned.endsWith("e") &&
+    !isVowelAt(cleaned, cleaned.length - 2) &&
+    hasVowel(cleaned.slice(0, -2));
+  const searchEnd = hasSilentE ? cleaned.length - 1 : cleaned.length;
 
-  if (vowelIndex === -1) return cleaned.slice(-2);
+  let i = searchEnd - 1;
+  while (i >= 0 && !isVowelAt(cleaned, i)) i--;
+  if (i < 0) return cleaned.slice(-2);
 
-  const vowel = cleaned[vowelIndex];
-  const tail = cleaned.slice(vowelIndex);
-  const onset = cleaned.slice(0, vowelIndex).replace(/[^bcdfghjklmnpqrstvwxyz]/g, "");
-  const group = VOWEL_GROUPS[vowel] ?? vowel.toUpperCase();
+  while (i > 0 && isVowelAt(cleaned, i - 1)) i--;
 
-  return `${group}:${onset.slice(-1)}${tail}`;
+  // Doubled consonants after the vowel are purely orthographic: "hills" rhymes "daffodils".
+  const key = cleaned.slice(i).replace(/([bcdfghjklmnpqrstvwxz])\1+/g, "$1");
+
+  // A final "y" is /aɪ/ when it is the only vowel ("sky") but /i/ otherwise ("pity").
+  if (key === "y") return hasVowel(cleaned.slice(0, i)) ? "y" : "ay";
+
+  return key;
 }
 
 export function computeRhymeScheme(lines: string[]): RhymeSchemeResult {

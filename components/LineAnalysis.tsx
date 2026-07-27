@@ -1,6 +1,5 @@
 "use client";
 
-import { useState } from "react";
 import { BarChart3 } from "lucide-react";
 import { CadenceReader } from "./CadenceReader";
 import type { LineAnalysisResult } from "@/hooks/useLineAnalysis";

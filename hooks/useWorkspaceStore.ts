@@ -1,11 +1,10 @@
 "use client";
 
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState, useSyncExternalStore } from "react";
 import {
   createDefaultWorkspace,
   createId,
   type Notebook,
-  type Poem,
   type WorkspaceState,
 } from "@/lib/workspaceTypes";
 
@@ -29,15 +28,17 @@ function saveWorkspace(state: WorkspaceState) {
   localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
 }
 
-export function useWorkspaceStore() {
-  const [state, setState] = useState<WorkspaceState>(createDefaultWorkspace);
-  const [hydrated, setHydrated] = useState(false);
-  const saveTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+const subscribeToNothing = () => () => {};
 
-  useEffect(() => {
-    setState(loadWorkspace());
-    setHydrated(true);
-  }, []);
+export function useWorkspaceStore() {
+  // Reading storage in the initializer is safe because nothing renders until `hydrated` flips.
+  const [state, setState] = useState<WorkspaceState>(loadWorkspace);
+  const hydrated = useSyncExternalStore(
+    subscribeToNothing,
+    () => true,
+    () => false
+  );
+  const saveTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   useEffect(() => {
     if (!hydrated) return;

@@ -21,7 +21,9 @@ export function WritingWorkspace() {
   const [footPreset, setFootPreset] = useState<FootPreset>("any");
   const [showAllMeterBreaks, setShowAllMeterBreaks] = useState(false);
   const [toolbarVisible, setToolbarVisible] = useState(true);
-  const textareaRef = useRef<HTMLTextAreaElement | null>(null);
+  // Held in state, not a ref: the popover anchor is derived during render and must
+  // recompute once the textarea actually mounts.
+  const [textareaEl, setTextareaEl] = useState<HTMLTextAreaElement | null>(null);
   const typingTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const { theme, setTheme } = useTheme();
@@ -52,9 +54,9 @@ export function WritingWorkspace() {
   );
 
   const selectionAnchor = useMemo(() => {
-    if (!selectedWord || !textareaRef.current) return null;
-    return getSelectionAnchor(textareaRef.current, ui.selectionRange.end);
-  }, [selectedWord, ui.selectionRange.end, text]);
+    if (!selectedWord || !textareaEl) return null;
+    return getSelectionAnchor(textareaEl, ui.selectionRange.end);
+  }, [selectedWord, textareaEl, ui.selectionRange.end]);
 
   const handleTyping = useCallback(() => {
     ui.setIsTyping(true);
@@ -108,9 +110,7 @@ export function WritingWorkspace() {
           text={text}
           onTextChange={updatePoemText}
           onSelectionChange={ui.setSelectionRange}
-          onTextareaRef={(el) => {
-            textareaRef.current = el;
-          }}
+          onTextareaRef={setTextareaEl}
           analysis={analysis}
           onTyping={handleTyping}
           onBlur={handleBlur}

@@ -1,15 +1,19 @@
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState, useSyncExternalStore } from "react";
 import { bpmToSpeechRate } from "@/lib/cadence";
+
+const subscribeToNothing = () => () => {};
 
 export function useCadenceReader() {
   const [bpm, setBpm] = useState(100);
   const [isPlaying, setIsPlaying] = useState(false);
-  const [isSupported, setIsSupported] = useState(true);
   const utteranceRef = useRef<SpeechSynthesisUtterance | null>(null);
 
-  useEffect(() => {
-    setIsSupported(typeof window !== "undefined" && "speechSynthesis" in window);
-  }, []);
+  // Assume supported until mounted so the control never flashes disabled during hydration.
+  const isSupported = useSyncExternalStore(
+    subscribeToNothing,
+    () => "speechSynthesis" in window,
+    () => true
+  );
 
   const stop = useCallback(() => {
     if (typeof window !== "undefined" && window.speechSynthesis) {
