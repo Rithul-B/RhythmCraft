@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { PoetryEditor } from "@/components/PoetryEditor";
 import { EditorHeader } from "@/components/EditorHeader";
 import { SlideDrawer } from "@/components/SlideDrawer";
@@ -28,7 +28,30 @@ function readGrammarPref(): boolean {
   return localStorage.getItem(GRAMMAR_STORAGE_KEY) === "1";
 }
 
+/** Lock CSS --app-height to the visible viewport (Android Chrome URL bar). */
+function useAppHeightVar() {
+  useEffect(() => {
+    function sync() {
+      const h = Math.round(window.visualViewport?.height ?? window.innerHeight);
+      document.documentElement.style.setProperty("--app-height", `${h}px`);
+    }
+    sync();
+    const vv = window.visualViewport;
+    vv?.addEventListener("resize", sync);
+    vv?.addEventListener("scroll", sync);
+    window.addEventListener("resize", sync);
+    window.addEventListener("orientationchange", sync);
+    return () => {
+      vv?.removeEventListener("resize", sync);
+      vv?.removeEventListener("scroll", sync);
+      window.removeEventListener("resize", sync);
+      window.removeEventListener("orientationchange", sync);
+    };
+  }, []);
+}
+
 export function WritingWorkspace() {
+  useAppHeightVar();
   const [footPreset, setFootPreset] = useState<FootPreset>("any");
   const [showAllMeterBreaks, setShowAllMeterBreaks] = useState(false);
   const [toolbarVisible, setToolbarVisible] = useState(true);
@@ -125,7 +148,7 @@ export function WritingWorkspace() {
 
   if (!hydrated) {
     return (
-      <div className="flex h-dvh items-center justify-center bg-[var(--bg)] text-[var(--muted)]">
+      <div className="app-shell flex items-center justify-center bg-[var(--bg)] text-[var(--muted)]">
         {t("loading")}
       </div>
     );
@@ -133,7 +156,7 @@ export function WritingWorkspace() {
 
   return (
     <div
-      className="relative flex h-dvh flex-col overflow-hidden"
+      className="app-shell relative flex flex-col"
       style={{
         ["--editor-font-size" as string]: "clamp(1.05rem, 2.5vw, 1.25rem)",
         ["--editor-padding-y" as string]: "clamp(1.5rem, 4vw, 3rem)",

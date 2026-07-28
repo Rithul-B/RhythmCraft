@@ -64,9 +64,9 @@ export default function RootLayout({
     <html
       lang="en"
       data-theme="parchment"
-      className={`${newsreader.variable} ${inter.variable} ${geistMono.variable} h-dvh`}
+      className={`${newsreader.variable} ${inter.variable} ${geistMono.variable}`}
     >
-      <body className="h-dvh overflow-hidden overscroll-none bg-[var(--bg)] text-[var(--text)] antialiased">
+      <body className="bg-[var(--bg)] text-[var(--text)] antialiased">
         {children}
       </body>
     </html>

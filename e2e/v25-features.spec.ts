@@ -206,12 +206,26 @@ test.describe("RhythmCraft v3.0", () => {
   });
 
   test("9b. iPad portrait also uses bottom sheet drawers", async ({ page }) => {
-    // 820 CSS px is a common iPad portrait width; must not use desktop side drawers.
+    // Common tablet widths must not use desktop side drawers.
     await page.setViewportSize({ width: 820, height: 1180 });
     await page.reload();
     await expect(page.getByTestId("poetry-editor")).toBeVisible({ timeout: 15_000 });
     await page.keyboard.press("Control+i");
     await expect(page.getByTestId("mobile-bottom-sheet")).toBeVisible({ timeout: 8_000 });
+  });
+
+  test("9c. Android phone viewport keeps a stable editor shell", async ({ page }) => {
+    // Redmi / mid-range Android Chrome sizes.
+    await page.setViewportSize({ width: 393, height: 851 });
+    await page.reload();
+    await expect(page.getByTestId("poetry-editor")).toBeVisible({ timeout: 15_000 });
+    await page.getByTestId("grammar-toolbar-toggle").click();
+    await expect(page.getByTestId("grammar-status")).toBeVisible({ timeout: 5_000 });
+    await page.keyboard.press("Control+i");
+    await expect(page.getByTestId("mobile-bottom-sheet")).toBeVisible({ timeout: 8_000 });
+    // Shell should still expose the editor behind/around overlays after close.
+    await page.keyboard.press("Escape");
+    await expect(page.getByTestId("poetry-editor")).toBeVisible();
   });
 
   test("10. Italian synonyms-only mode returns Free Dictionary results", async ({ page }) => {

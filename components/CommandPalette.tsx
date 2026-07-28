@@ -40,14 +40,15 @@ export function CommandPalette({
   return (
     <div className="fixed inset-0 z-50 flex items-start justify-center px-3 pt-[max(1rem,env(safe-area-inset-top))] sm:px-4 sm:pt-[8vh] lg:pt-[12vh]">
       <div
-        className="absolute inset-0 bg-black/25 backdrop-blur-sm"
+        className="absolute inset-0 bg-black/35"
         onClick={onClose}
       />
       <div
-        className="relative z-10 flex max-h-[min(85dvh,100%)] w-full max-w-xl flex-col overflow-hidden rounded-2xl border border-[var(--glass-border)] bg-[var(--glass-bg)] font-[family-name:var(--font-ui)] shadow-2xl backdrop-blur-xl lg:max-h-[75vh]"
+        className="relative z-10 flex max-h-[min(85vh,100%)] w-full max-w-xl flex-col overflow-hidden rounded-2xl border border-[var(--glass-border)] bg-[var(--surface-raised)] font-[family-name:var(--font-ui)] shadow-2xl lg:max-h-[75vh]"
         style={{
           boxShadow: "var(--drawer-shadow)",
           paddingBottom: "env(safe-area-inset-bottom, 0px)",
+          maxHeight: "min(85dvh, 100%)",
         }}
         role="dialog"
         aria-modal

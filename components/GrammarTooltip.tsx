@@ -28,7 +28,7 @@ export function GrammarTooltip({
     <>
       <div className="fixed inset-0 z-40" onClick={onClose} />
       <div
-        className="fixed z-50 min-w-[220px] max-w-[300px] rounded-2xl border border-[var(--glass-border)] bg-[var(--glass-bg)] p-3 font-[family-name:var(--font-ui)] shadow-xl backdrop-blur-xl"
+        className="fixed z-50 min-w-[220px] max-w-[300px] rounded-2xl border border-[var(--glass-border)] bg-[var(--surface-raised)] p-3 font-[family-name:var(--font-ui)] shadow-xl"
         style={{
           top: pos.top,
           left: pos.left,

@@ -13,11 +13,12 @@
   --divider: rgb(42 42 42 / 0.06);
   --shadow-soft: 0 1px 3px rgb(42 42 42 / 0.04), 0 8px 24px rgb(42 42 42 / 0.03);
   --drawer-shadow: 0 0 40px rgb(42 42 42 / 0.08);
-  --glass-bg: rgb(255 255 255 / 0.72);
+  --glass-bg: rgb(255 255 255 / 0.92);
   --glass-border: rgb(42 42 42 / 0.08);
   --glow-active: rgb(139 115 85 / 0.4);
   --background: var(--bg);
   --foreground: var(--text);
+  --app-height: 100vh;
 }
 
 [data-theme="midnight"] {
@@ -32,11 +33,17 @@
   --divider: rgb(232 230 227 / 0.06);
   --shadow-soft: 0 1px 3px rgb(0 0 0 / 0.25), 0 8px 24px rgb(0 0 0 / 0.2);
   --drawer-shadow: 0 0 40px rgb(0 0 0 / 0.4);
-  --glass-bg: rgb(26 26 30 / 0.85);
+  --glass-bg: rgb(26 26 30 / 0.94);
   --glass-border: rgb(232 230 227 / 0.08);
   --glow-active: rgb(196 168 130 / 0.35);
   --background: var(--bg);
   --foreground: var(--text);
+}
+
+@supports (height: 100dvh) {
+  :root {
+    --app-height: 100dvh;
+  }
 }
 
 @theme inline {
@@ -46,22 +53,32 @@
   --font-mono: var(--font-geist-mono);
 }
 
+html,
 body {
-  background: var(--bg);
+  height: var(--app-height);
+  max-height: var(--app-height);
+  overflow: hidden;
+  overscroll-behavior: none;
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+}
+
+body {
   color: var(--text);
   font-family: var(--font-ui), system-ui, sans-serif;
-}
-
-[data-theme="parchment"] body {
-  background: linear-gradient(165deg, #f7f5f0 0%, #f0ede6 50%, #f7f5f0 100%);
-}
-
-[data-theme="midnight"] body {
-  background: linear-gradient(165deg, #121214 0%, #1a1a1e 50%, #121214 100%);
+  /* Solid fill — gradients + blur jank hard on mid-range Android. */
+  background-color: var(--bg);
 }
 
 * {
   box-sizing: border-box;
+}
+
+button,
+a,
+[role="button"] {
+  touch-action: manipulation;
+  -webkit-tap-highlight-color: transparent;
 }
 
 ::selection {
@@ -70,13 +87,11 @@ body {
 }
 
 .zen-pill {
-  transition: background-color 300ms ease-in-out, color 300ms ease-in-out,
-    box-shadow 300ms ease-in-out;
+  transition: background-color 160ms ease-out, color 160ms ease-out;
 }
 
 @media (hover: hover) and (pointer: fine) {
   .zen-pill:hover {
-    transform: translateY(-2px);
     box-shadow: var(--shadow-soft);
   }
 }
@@ -85,8 +100,14 @@ body {
   box-shadow: 0 0 12px var(--accent-soft);
 }
 
-/* Avoid iOS Safari auto-zoom on focus (inputs must be ≥16px). */
-@media (max-width: 1023px) {
+.app-shell {
+  height: var(--app-height);
+  max-height: var(--app-height);
+  overflow: hidden;
+}
+
+/* Avoid iOS/Android auto-zoom on focus (inputs must be ≥16px). */
+@media (max-width: 1279px) {
   :root {
     --editor-font-size: 1.125rem;
     --editor-padding-y: 1.5rem;
@@ -100,10 +121,19 @@ body {
   }
 }
 
+/* Disable expensive backdrop filters on touch / coarse pointers (Redmi, Tabs). */
+@media (hover: none), (pointer: coarse) {
+  .backdrop-blur-sm,
+  .backdrop-blur-xl,
+  .mobile-sheet {
+    -webkit-backdrop-filter: none !important;
+    backdrop-filter: none !important;
+  }
+}
+
 @supports (padding: env(safe-area-inset-bottom)) {
   :root {
     --safe-bottom: env(safe-area-inset-bottom, 0px);
     --safe-top: env(safe-area-inset-top, 0px);
   }
 }
-
