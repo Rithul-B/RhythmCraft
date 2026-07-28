@@ -37,7 +37,7 @@ export function VoiceReaderControls({
         <select
           value={selectedVoiceURI}
           onChange={(e) => onVoiceChange(e.target.value)}
-          className="min-h-11 w-full rounded-xl border border-[var(--glass-border)] bg-[var(--surface)] px-3 py-2 text-xs text-[var(--text)] md:min-h-0"
+          className="min-h-11 w-full rounded-xl border border-[var(--glass-border)] bg-[var(--surface)] px-3 py-2 text-base text-[var(--text)] lg:text-xs"
         >
           {voices.length === 0 ? (
             <option value="">{labels.defaultVoice ?? "Default"}</option>

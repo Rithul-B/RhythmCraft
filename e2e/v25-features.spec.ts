@@ -205,6 +205,15 @@ test.describe("RhythmCraft v3.0", () => {
     await expect(page.getByTestId("inspector-drawer")).toBeVisible();
   });
 
+  test("9b. iPad portrait also uses bottom sheet drawers", async ({ page }) => {
+    // 820 CSS px is a common iPad portrait width; must not use desktop side drawers.
+    await page.setViewportSize({ width: 820, height: 1180 });
+    await page.reload();
+    await expect(page.getByTestId("poetry-editor")).toBeVisible({ timeout: 15_000 });
+    await page.keyboard.press("Control+i");
+    await expect(page.getByTestId("mobile-bottom-sheet")).toBeVisible({ timeout: 8_000 });
+  });
+
   test("10. Italian synonyms-only mode returns Free Dictionary results", async ({ page }) => {
     await page.getByTestId("language-selector").click();
     await page.getByRole("option", { name: /Italiano/i }).click();

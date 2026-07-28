@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { countWordSyllables } from "@/lib/syllables";
 import { fetchFreeDictionarySynonyms } from "@/lib/freeDictionary";
 import { hasFullWordSearch, type AppLanguage } from "@/lib/i18n/languages";
+import { clampPopoverPosition } from "@/lib/popoverPosition";
 import type { WordResult } from "@/lib/datamuse";
 
 const EMPTY_RESULTS: WordResult[] = [];
@@ -75,6 +76,7 @@ export function SelectionPopover({
   if (!word || !anchor) return null;
 
   const syllables = countWordSyllables(word);
+  const pos = clampPopoverPosition(anchor, 280, 180);
 
   return (
     <>
@@ -82,8 +84,8 @@ export function SelectionPopover({
       <div
         className="fixed z-50 min-w-[220px] max-w-[280px] rounded-2xl border border-[var(--glass-border)] bg-[var(--glass-bg)] p-3 font-[family-name:var(--font-ui)] shadow-xl backdrop-blur-xl"
         style={{
-          top: anchor.top + 8,
-          left: Math.max(16, Math.min(anchor.left, window.innerWidth - 296)),
+          top: pos.top,
+          left: pos.left,
           boxShadow: "var(--drawer-shadow)",
         }}
         data-testid="selection-popover"

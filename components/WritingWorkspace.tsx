@@ -125,7 +125,7 @@ export function WritingWorkspace() {
 
   if (!hydrated) {
     return (
-      <div className="flex h-screen items-center justify-center bg-[var(--bg)] text-[var(--muted)]">
+      <div className="flex h-dvh items-center justify-center bg-[var(--bg)] text-[var(--muted)]">
         {t("loading")}
       </div>
     );
@@ -133,11 +133,12 @@ export function WritingWorkspace() {
 
   return (
     <div
-      className="relative flex h-screen flex-col overflow-hidden"
+      className="relative flex h-dvh flex-col overflow-hidden"
       style={{
         ["--editor-font-size" as string]: "clamp(1.05rem, 2.5vw, 1.25rem)",
         ["--editor-padding-y" as string]: "clamp(1.5rem, 4vw, 3rem)",
         ["--editor-padding-x" as string]: "clamp(1rem, 3vw, 2rem)",
+        paddingTop: "env(safe-area-inset-top, 0px)",
       }}
     >
       <EditorHeader
@@ -155,7 +156,7 @@ export function WritingWorkspace() {
         t={t}
       />
 
-      <main className="flex min-h-0 flex-1 justify-center overflow-y-auto px-3 py-4 md:px-8 md:py-10">
+      <main className="flex min-h-0 flex-1 justify-center overflow-y-auto overscroll-contain px-3 py-4 pb-28 md:px-8 md:py-10 md:pb-28">
         <PoetryEditor
           text={text}
           onTextChange={updatePoemText}

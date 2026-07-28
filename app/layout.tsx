@@ -45,6 +45,10 @@ export const metadata: Metadata = {
 };
 
 export const viewport: Viewport = {
+  width: "device-width",
+  initialScale: 1,
+  maximumScale: 5,
+  viewportFit: "cover",
   themeColor: [
     { media: "(prefers-color-scheme: light)", color: "#F7F5F0" },
     { media: "(prefers-color-scheme: dark)", color: "#121214" },
@@ -60,9 +64,9 @@ export default function RootLayout({
     <html
       lang="en"
       data-theme="parchment"
-      className={`${newsreader.variable} ${inter.variable} ${geistMono.variable} h-full`}
+      className={`${newsreader.variable} ${inter.variable} ${geistMono.variable} h-dvh`}
     >
-      <body className="h-full overflow-hidden bg-[var(--bg)] text-[var(--text)] antialiased">
+      <body className="h-dvh overflow-hidden overscroll-none bg-[var(--bg)] text-[var(--text)] antialiased">
         {children}
       </body>
     </html>

@@ -12,6 +12,7 @@ interface ExportMenuProps {
   exportLabel?: string;
   downloadTxtLabel?: string;
   downloadPdfLabel?: string;
+  iconOnlyOnMobile?: boolean;
 }
 
 export function ExportMenu({
@@ -21,18 +22,19 @@ export function ExportMenu({
   exportLabel = "Export",
   downloadTxtLabel = "Download .txt",
   downloadPdfLabel = "Download .pdf",
+  iconOnlyOnMobile = false,
 }: ExportMenuProps) {
   const [open, setOpen] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    function handleClick(e: MouseEvent) {
+    function handleClick(e: Event) {
       if (ref.current && !ref.current.contains(e.target as Node)) {
         setOpen(false);
       }
     }
-    document.addEventListener("mousedown", handleClick);
-    return () => document.removeEventListener("mousedown", handleClick);
+    document.addEventListener("pointerdown", handleClick);
+    return () => document.removeEventListener("pointerdown", handleClick);
   }, []);
 
   const options = {
@@ -47,10 +49,12 @@ export function ExportMenu({
       <button
         type="button"
         onClick={() => setOpen(!open)}
-        className="flex min-h-11 items-center gap-1.5 rounded-full px-3 py-1.5 text-xs text-[var(--muted)] hover:bg-[var(--surface-raised)]/60 md:min-h-0"
+        className="flex min-h-11 min-w-11 items-center justify-center gap-1.5 rounded-full px-2 py-1.5 text-xs text-[var(--muted)] hover:bg-[var(--surface-raised)]/60 sm:min-w-0 sm:px-3"
+        aria-label={exportLabel}
+        title={exportLabel}
       >
         <Download className="h-3.5 w-3.5" strokeWidth={1.5} />
-        {exportLabel}
+        <span className={iconOnlyOnMobile ? "hidden lg:inline" : undefined}>{exportLabel}</span>
       </button>
 
       {open && (

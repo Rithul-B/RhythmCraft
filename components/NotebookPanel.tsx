@@ -64,7 +64,7 @@ export function NotebookPanel({
         </button>
       </div>
 
-      <div className="min-h-0 flex-1 overflow-y-auto px-3 pb-4">
+      <div className="min-h-0 flex-1 overflow-y-auto overscroll-contain px-3 pb-4">
         {notebooks.map((nb) => (
           <div key={nb.id} className="mb-4">
             <p className="mb-1.5 px-2 text-[10px] font-medium tracking-wide text-[var(--muted)] uppercase">

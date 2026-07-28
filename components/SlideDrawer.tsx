@@ -1,6 +1,7 @@
 "use client";
 
-import { useEffect, useRef, useState, useSyncExternalStore } from "react";
+import { useEffect, useRef, useState } from "react";
+import { useIsDesktopLayout } from "@/hooks/useIsDesktopLayout";
 
 interface SlideDrawerProps {
   side: "left" | "right";
@@ -9,22 +10,6 @@ interface SlideDrawerProps {
   children: React.ReactNode;
   width?: string;
   label: string;
-}
-
-const MD_QUERY = "(min-width: 768px)";
-
-function subscribeMd(onChange: () => void) {
-  const mql = window.matchMedia(MD_QUERY);
-  mql.addEventListener("change", onChange);
-  return () => mql.removeEventListener("change", onChange);
-}
-
-function getMdSnapshot() {
-  return window.matchMedia(MD_QUERY).matches;
-}
-
-function getMdServerSnapshot() {
-  return true;
 }
 
 export function SlideDrawer({
@@ -36,12 +21,12 @@ export function SlideDrawer({
   label,
 }: SlideDrawerProps) {
   const drawerWidth = width ?? (side === "left" ? "280px" : "360px");
-  const isDesktop = useSyncExternalStore(subscribeMd, getMdSnapshot, getMdServerSnapshot);
+  const isDesktop = useIsDesktopLayout();
   const [dragY, setDragY] = useState(0);
+  const [isDragging, setIsDragging] = useState(false);
   const dragging = useRef(false);
   const startY = useRef(0);
-  // Reset drag offset when the sheet closes without an effect-driven setState.
-  const effectiveDragY = open ? dragY : 0;
+  const dragYRef = useRef(0);
 
   useEffect(() => {
     if (!open) return;
@@ -52,29 +37,46 @@ export function SlideDrawer({
     return () => window.removeEventListener("keydown", onKey);
   }, [open, onClose]);
 
-  function onPointerDown(e: React.PointerEvent) {
+  // Prevent background rubber-banding while a sheet/drawer is open on iOS.
+  useEffect(() => {
+    if (!open) return;
+    const main = document.querySelector("main");
+    const prev = main instanceof HTMLElement ? main.style.overflow : "";
+    if (main instanceof HTMLElement) main.style.overflow = "hidden";
+    return () => {
+      if (main instanceof HTMLElement) main.style.overflow = prev;
+    };
+  }, [open]);
+
+  function onPointerDown(e: React.PointerEvent<HTMLDivElement>) {
     dragging.current = true;
+    setIsDragging(true);
     startY.current = e.clientY;
-    (e.target as HTMLElement).setPointerCapture?.(e.pointerId);
+    dragYRef.current = 0;
+    e.currentTarget.setPointerCapture?.(e.pointerId);
   }
 
   function onPointerMove(e: React.PointerEvent) {
     if (!dragging.current) return;
     const delta = Math.max(0, e.clientY - startY.current);
+    dragYRef.current = delta;
     setDragY(delta);
   }
 
-  function onPointerUp() {
+  function onPointerUp(e: React.PointerEvent<HTMLDivElement>) {
     if (!dragging.current) return;
     dragging.current = false;
-    if (dragY > 120) onClose();
+    setIsDragging(false);
+    e.currentTarget.releasePointerCapture?.(e.pointerId);
+    if (dragYRef.current > 100) onClose();
+    dragYRef.current = 0;
     setDragY(0);
   }
 
   return (
     <>
       <div
-        className={`fixed inset-0 z-30 bg-black/20 backdrop-blur-sm transition-opacity duration-300 ease-in-out md:bg-black/15 ${
+        className={`fixed inset-0 z-30 bg-black/20 backdrop-blur-sm transition-opacity duration-300 ease-in-out ${
           open ? "opacity-100" : "pointer-events-none opacity-0"
         }`}
         onClick={onClose}
@@ -83,12 +85,16 @@ export function SlideDrawer({
 
       {!isDesktop ? (
         <div
-          className={`fixed inset-x-0 bottom-0 z-40 flex max-h-[90vh] flex-col rounded-t-3xl border border-[var(--glass-border)] bg-[var(--glass-bg)] backdrop-blur-xl transition-transform duration-300 ease-in-out ${
-            open ? "translate-y-0" : "translate-y-full"
-          }`}
+          className="fixed inset-x-0 bottom-0 z-40 flex flex-col rounded-t-3xl border border-[var(--glass-border)] bg-[var(--glass-bg)] backdrop-blur-xl"
           style={{
             boxShadow: "var(--drawer-shadow)",
-            transform: open ? `translateY(${effectiveDragY}px)` : undefined,
+            maxHeight: "min(90dvh, 90%)",
+            paddingBottom: "env(safe-area-inset-bottom, 0px)",
+            transform: open
+              ? `translate3d(0, ${dragY}px, 0)`
+              : "translate3d(0, 100%, 0)",
+            transition: isDragging ? "none" : "transform 300ms ease-in-out",
+            willChange: "transform",
           }}
           role="dialog"
           aria-label={label}
@@ -109,20 +115,22 @@ export function SlideDrawer({
         </div>
       ) : (
         <div
-          className={`fixed top-0 z-40 flex h-full flex-col border-[var(--glass-border)] bg-[var(--glass-bg)] backdrop-blur-xl transition-all duration-300 ease-in-out ${
+          className={`fixed top-0 bottom-0 z-40 flex flex-col border-[var(--glass-border)] bg-[var(--glass-bg)] backdrop-blur-xl transition-transform duration-300 ease-in-out ${
             side === "left" ? "left-0 border-r" : "right-0 border-l"
           } ${open ? "translate-x-0" : side === "left" ? "-translate-x-full" : "translate-x-full"}`}
           style={{
             width: "min(100vw, var(--drawer-width))",
             ["--drawer-width" as string]: drawerWidth,
             boxShadow: "var(--drawer-shadow)",
+            paddingTop: "env(safe-area-inset-top, 0px)",
+            paddingBottom: "env(safe-area-inset-bottom, 0px)",
           }}
           role="dialog"
           aria-label={label}
           aria-modal={open}
           inert={!open}
         >
-          {children}
+          <div className="flex h-full min-h-0 flex-col overflow-hidden">{children}</div>
         </div>
       )}
     </>

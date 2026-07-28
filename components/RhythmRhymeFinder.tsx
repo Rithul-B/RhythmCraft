@@ -76,7 +76,8 @@ export function RhythmRhymeFinder({
           value={query}
           onChange={(e) => setQuery(e.target.value)}
           placeholder={t("searchPlaceholder")}
-          className="min-h-11 w-full rounded-full border border-[var(--glass-border)] bg-[var(--surface-raised)]/70 py-3 pl-11 pr-5 text-sm text-[var(--text)] shadow-sm placeholder:text-[var(--muted-light)] transition-all duration-300 focus:shadow-md focus:outline-none md:min-h-0"
+          className="min-h-11 w-full rounded-full border border-[var(--glass-border)] bg-[var(--surface-raised)]/70 py-3 pl-11 pr-5 text-base text-[var(--text)] shadow-sm placeholder:text-[var(--muted-light)] transition-all duration-300 focus:shadow-md focus:outline-none lg:text-sm"
+          enterKeyHint="search"
         />
       </div>
 

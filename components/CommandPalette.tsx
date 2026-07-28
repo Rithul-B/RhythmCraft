@@ -38,14 +38,17 @@ export function CommandPalette({
   if (!open) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-start justify-center px-4 pt-[8vh] md:pt-[12vh]">
+    <div className="fixed inset-0 z-50 flex items-start justify-center px-3 pt-[max(1rem,env(safe-area-inset-top))] sm:px-4 sm:pt-[8vh] lg:pt-[12vh]">
       <div
         className="absolute inset-0 bg-black/25 backdrop-blur-sm"
         onClick={onClose}
       />
       <div
-        className="relative z-10 flex max-h-[85vh] w-full max-w-xl flex-col overflow-hidden rounded-2xl border border-[var(--glass-border)] bg-[var(--glass-bg)] font-[family-name:var(--font-ui)] shadow-2xl backdrop-blur-xl md:max-h-[75vh]"
-        style={{ boxShadow: "var(--drawer-shadow)" }}
+        className="relative z-10 flex max-h-[min(85dvh,100%)] w-full max-w-xl flex-col overflow-hidden rounded-2xl border border-[var(--glass-border)] bg-[var(--glass-bg)] font-[family-name:var(--font-ui)] shadow-2xl backdrop-blur-xl lg:max-h-[75vh]"
+        style={{
+          boxShadow: "var(--drawer-shadow)",
+          paddingBottom: "env(safe-area-inset-bottom, 0px)",
+        }}
         role="dialog"
         aria-modal
         aria-label={t("searchRhymesSynonyms")}
@@ -64,7 +67,7 @@ export function CommandPalette({
             <X className="h-4 w-4" />
           </button>
         </div>
-        <div className="min-h-0 flex-1 overflow-y-auto p-4">
+        <div className="min-h-0 flex-1 overflow-y-auto overscroll-contain p-4">
           <RhythmRhymeFinder
             footPreset={footPreset}
             onFootPresetChange={onFootPresetChange}

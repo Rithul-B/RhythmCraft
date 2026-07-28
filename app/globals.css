@@ -70,23 +70,40 @@ body {
 }
 
 .zen-pill {
-  transition: all 300ms ease-in-out;
+  transition: background-color 300ms ease-in-out, color 300ms ease-in-out,
+    box-shadow 300ms ease-in-out;
 }
 
-.zen-pill:hover {
-  transform: translateY(-2px);
-  box-shadow: var(--shadow-soft);
+@media (hover: hover) and (pointer: fine) {
+  .zen-pill:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-soft);
+  }
 }
 
 .zen-pill-active {
   box-shadow: 0 0 12px var(--accent-soft);
 }
 
-@media (max-width: 768px) {
+/* Avoid iOS Safari auto-zoom on focus (inputs must be ≥16px). */
+@media (max-width: 1023px) {
   :root {
-    --editor-font-size: 1.1rem;
-    --editor-padding-y: 1.75rem;
-    --editor-padding-x: 1.25rem;
+    --editor-font-size: 1.125rem;
+    --editor-padding-y: 1.5rem;
+    --editor-padding-x: 1rem;
+  }
+
+  input,
+  textarea,
+  select {
+    font-size: 16px !important;
+  }
+}
+
+@supports (padding: env(safe-area-inset-bottom)) {
+  :root {
+    --safe-bottom: env(safe-area-inset-bottom, 0px);
+    --safe-top: env(safe-area-inset-top, 0px);
   }
 }
 
