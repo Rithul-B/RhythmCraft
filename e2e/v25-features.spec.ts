@@ -190,4 +190,19 @@ test.describe("RhythmCraft v3.0", () => {
     await expect(page.getByTestId("mobile-bottom-sheet")).toBeVisible();
     await expect(page.getByTestId("inspector-drawer")).toBeVisible();
   });
+
+  test("10. Italian synonyms-only mode returns Free Dictionary results", async ({ page }) => {
+    await page.getByTestId("language-selector").click();
+    await page.getByRole("option", { name: /Italiano/i }).click();
+    await page.keyboard.press("Control+i");
+    const drawer = page.getByTestId("inspector-drawer");
+    await expect(drawer).toBeVisible();
+    await expect(drawer.getByTestId("synonyms-only-note")).toBeVisible();
+    await expect(drawer.getByText(/Syllables|Sillabe/i)).toHaveCount(0);
+    const input = drawer.getByPlaceholder(/Cerca rime|Search rhymes|Buscar|Rechercher|Reime/i);
+    await input.fill("casa");
+    await expect(
+      drawer.getByRole("button").filter({ hasText: /dimora|abitazione|casa/i }).first()
+    ).toBeVisible({ timeout: 15_000 });
+  });
 });

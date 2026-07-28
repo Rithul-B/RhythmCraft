@@ -7,7 +7,7 @@ A meter-aware writing app for poets and lyricists. Write in a distraction-free c
 - **Editorial Zen canvas** — centered serif editor with everything else tucked away until you need it
 - **Live meter diagnostics** — detects the prevailing metrical foot and softly underlines lines that break it
 - **Rhyme scheme mapping** — computes ABAB, AABB, and other patterns as you write
-- **Rhyme & synonym search** — English/Spanish via [Datamuse](https://datamuse.com); French/German/Italian synonyms via Free Dictionary API
+- **Rhyme & synonym search** — English/Spanish via [Datamuse](https://datamuse.com); French/German/Italian synonyms via [FreeDictionaryAPI](https://freedictionaryapi.com) (Wiktionary)
 - **Emoji suggestions** — poetic keyword search also returns relevant emoji
 - **Tone & Vibe filters** — melancholic, ethereal, gothic, uplifting, archaic, modern/gritty, and slang/vernacular (English)
 - **Spelling & grammar** — opt-in LanguageTool linting with wavy underlines and quick-fix tooltips (off by default)
@@ -69,4 +69,4 @@ Next.js 16 (App Router), React 19, TypeScript, Tailwind CSS v4, Lucide icons, js
 
 ## Credits
 
-Word data provided by the [Datamuse API](https://datamuse.com) and [Free Dictionary API](https://dictionaryapi.dev). Grammar checking by [LanguageTool](https://languagetool.org).
+Word data provided by the [Datamuse API](https://datamuse.com) and [FreeDictionaryAPI.com](https://freedictionaryapi.com) (Wiktionary). Grammar checking by [LanguageTool](https://languagetool.org).

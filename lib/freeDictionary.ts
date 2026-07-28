@@ -1,20 +1,22 @@
 import type { WordResult } from "./datamuse";
 import type { AppLanguage } from "./i18n/languages";
 
-interface DictionaryDefinition {
+interface FreeDictSense {
   definition?: string;
   synonyms?: string[];
+  subsenses?: FreeDictSense[];
 }
 
-interface DictionaryMeaning {
+interface FreeDictEntry {
+  language?: { code?: string; name?: string };
   partOfSpeech?: string;
-  definitions?: DictionaryDefinition[];
   synonyms?: string[];
+  senses?: FreeDictSense[];
 }
 
-interface DictionaryEntry {
+interface FreeDictResponse {
   word?: string;
-  meanings?: DictionaryMeaning[];
+  entries?: FreeDictEntry[];
 }
 
 function estimateSyllables(word: string): number {
@@ -26,9 +28,21 @@ function estimateSyllables(word: string): number {
   return Math.max(1, groups?.length ?? 1);
 }
 
+function collectSynonyms(node: FreeDictSense | FreeDictEntry, into: Set<string>) {
+  for (const syn of node.synonyms ?? []) {
+    if (syn?.trim()) into.add(syn.trim());
+  }
+  if ("senses" in node) {
+    for (const sense of node.senses ?? []) collectSynonyms(sense, into);
+  }
+  if ("subsenses" in node) {
+    for (const sub of node.subsenses ?? []) collectSynonyms(sub, into);
+  }
+}
+
 /**
- * Fetch synonyms for French / German / Italian via Free Dictionary API (Wiktionary-backed).
- * Does not provide rhyme search.
+ * Fetch synonyms for French / German / Italian via FreeDictionaryAPI.com
+ * (Wiktionary-backed). Does not provide rhyme search.
  */
 export async function fetchFreeDictionarySynonyms(
   query: string,
@@ -38,35 +52,36 @@ export async function fetchFreeDictionarySynonyms(
   const trimmed = query.trim();
   if (!trimmed) return [];
 
-  const url = `https://api.dictionaryapi.dev/api/v2/entries/${lang}/${encodeURIComponent(trimmed)}`;
+  const url = `https://freedictionaryapi.com/api/v1/entries/${lang}/${encodeURIComponent(trimmed)}`;
 
   try {
     const res = await fetch(url, { signal });
     if (!res.ok) return [];
-    const data = (await res.json()) as DictionaryEntry[] | { title?: string };
-    if (!Array.isArray(data)) return [];
+    const data = (await res.json()) as FreeDictResponse;
+    if (!data?.entries?.length) return [];
 
     const synonyms = new Set<string>();
     const lowerQuery = trimmed.toLowerCase();
 
-    for (const entry of data) {
-      for (const meaning of entry.meanings ?? []) {
-        for (const syn of meaning.synonyms ?? []) {
-          if (syn && syn.toLowerCase() !== lowerQuery) synonyms.add(syn);
-        }
-        for (const def of meaning.definitions ?? []) {
-          for (const syn of def.synonyms ?? []) {
-            if (syn && syn.toLowerCase() !== lowerQuery) synonyms.add(syn);
-          }
-        }
-      }
+    for (const entry of data.entries) {
+      // Prefer entries that match the requested language when present.
+      if (entry.language?.code && entry.language.code !== lang) continue;
+      collectSynonyms(entry, synonyms);
     }
 
-    return [...synonyms].slice(0, 40).map((word) => ({
-      word,
-      numSyllables: estimateSyllables(word),
-      source: "datamuse" as const,
-    }));
+    // If language filtering removed everything (unexpected schema), fall back.
+    if (synonyms.size === 0) {
+      for (const entry of data.entries) collectSynonyms(entry, synonyms);
+    }
+
+    return [...synonyms]
+      .filter((word) => word.toLowerCase() !== lowerQuery)
+      .slice(0, 40)
+      .map((word) => ({
+        word,
+        numSyllables: estimateSyllables(word),
+        source: "datamuse" as const,
+      }));
   } catch {
     return [];
   }
