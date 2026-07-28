@@ -6,6 +6,7 @@ interface GrammarTooltipProps {
   match: GrammarMatch | null;
   anchor: { top: number; left: number } | null;
   replaceLabel: string;
+  noSuggestionsLabel?: string;
   onReplace: (replacement: string) => void;
   onClose: () => void;
 }
@@ -14,6 +15,7 @@ export function GrammarTooltip({
   match,
   anchor,
   replaceLabel,
+  noSuggestionsLabel = "No suggestions",
   onReplace,
   onClose,
 }: GrammarTooltipProps) {
@@ -46,7 +48,7 @@ export function GrammarTooltip({
             ))}
           </div>
         ) : (
-          <p className="text-[10px] text-[var(--muted)]">No suggestions</p>
+          <p className="text-[10px] text-[var(--muted)]">{noSuggestionsLabel}</p>
         )}
       </div>
     </>

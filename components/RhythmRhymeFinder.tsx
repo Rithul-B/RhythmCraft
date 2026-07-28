@@ -152,7 +152,7 @@ export function RhythmRhymeFinder({
                 type="button"
                 onClick={() => copyWord(emoji)}
                 className="zen-pill flex min-h-11 min-w-11 items-center justify-center rounded-full bg-[var(--surface-raised)]/60 text-lg hover:shadow-md md:min-h-0 md:min-w-0 md:px-3 md:py-1.5"
-                title={copiedWord === emoji ? "Copied" : "Copy"}
+                title={copiedWord === emoji ? t("copied") : t("copy")}
               >
                 {emoji}
               </button>

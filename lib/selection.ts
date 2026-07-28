@@ -13,7 +13,7 @@ export function getSelectedWord(
   const selected = text.slice(start, end).trim();
   if (!selected || /\s/.test(selected)) return null;
 
-  return selected.replace(/[^a-zA-Z'-]/g, "");
+  return selected.replace(/[^\p{L}'-]/gu, "");
 }
 
 export function getSelectionAnchor(

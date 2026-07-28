@@ -3,19 +3,28 @@
 import { useState, useRef, useEffect } from "react";
 import type { ThemeId } from "@/hooks/useTheme";
 
-const THEMES: { id: ThemeId; label: string; swatch: string }[] = [
-  { id: "parchment", label: "Cream Parchment", swatch: "#F7F5F0" },
-  { id: "midnight", label: "Obsidian Dark", swatch: "#121214" },
-];
-
 interface ThemeSwitcherProps {
   theme: ThemeId;
   onThemeChange: (theme: ThemeId) => void;
+  changeThemeLabel?: string;
+  parchmentLabel?: string;
+  midnightLabel?: string;
 }
 
-export function ThemeSwitcher({ theme, onThemeChange }: ThemeSwitcherProps) {
+export function ThemeSwitcher({
+  theme,
+  onThemeChange,
+  changeThemeLabel = "Change theme",
+  parchmentLabel = "Cream Parchment",
+  midnightLabel = "Obsidian Dark",
+}: ThemeSwitcherProps) {
   const [open, setOpen] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
+
+  const themes: { id: ThemeId; label: string; swatch: string }[] = [
+    { id: "parchment", label: parchmentLabel, swatch: "#F7F5F0" },
+    { id: "midnight", label: midnightLabel, swatch: "#121214" },
+  ];
 
   useEffect(() => {
     function handleClick(e: MouseEvent) {
@@ -27,7 +36,7 @@ export function ThemeSwitcher({ theme, onThemeChange }: ThemeSwitcherProps) {
     return () => document.removeEventListener("mousedown", handleClick);
   }, []);
 
-  const current = THEMES.find((t) => t.id === theme) ?? THEMES[0];
+  const current = themes.find((t) => t.id === theme) ?? themes[0];
 
   return (
     <div ref={ref} className="relative">
@@ -35,7 +44,8 @@ export function ThemeSwitcher({ theme, onThemeChange }: ThemeSwitcherProps) {
         type="button"
         onClick={() => setOpen(!open)}
         className="flex min-h-11 min-w-11 items-center justify-center rounded-full p-2 text-[var(--muted)] transition-all duration-300 hover:bg-[var(--surface-raised)]/60 hover:text-[var(--text)] md:min-h-0 md:min-w-0"
-        title="Change theme"
+        title={changeThemeLabel}
+        aria-label={changeThemeLabel}
       >
         <span
           className="block h-3.5 w-3.5 rounded-full border border-[var(--divider)]"
@@ -48,7 +58,7 @@ export function ThemeSwitcher({ theme, onThemeChange }: ThemeSwitcherProps) {
           className="absolute right-0 top-full z-50 mt-1 min-w-[160px] rounded-2xl border border-[var(--glass-border)] bg-[var(--glass-bg)] p-2 backdrop-blur-xl"
           style={{ boxShadow: "var(--shadow-soft)" }}
         >
-          {THEMES.map((t) => (
+          {themes.map((t) => (
             <button
               key={t.id}
               type="button"

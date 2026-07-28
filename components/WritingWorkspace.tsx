@@ -21,11 +21,19 @@ import { getSelectedWord, getSelectionAnchor } from "@/lib/selection";
 import type { FootPreset } from "@/lib/stress";
 import type { GrammarMatch } from "@/lib/grammarCheck";
 
+const GRAMMAR_STORAGE_KEY = "rhythmcraft-grammar-check";
+
+function readGrammarPref(): boolean {
+  if (typeof window === "undefined") return false;
+  return localStorage.getItem(GRAMMAR_STORAGE_KEY) === "1";
+}
+
 export function WritingWorkspace() {
   const [footPreset, setFootPreset] = useState<FootPreset>("any");
   const [showAllMeterBreaks, setShowAllMeterBreaks] = useState(false);
   const [toolbarVisible, setToolbarVisible] = useState(true);
-  const [grammarCheckEnabled, setGrammarCheckEnabled] = useState(false);
+  const [grammarCheckEnabled, setGrammarCheckEnabled] = useState(readGrammarPref);
+  const [inspectorTab, setInspectorTab] = useState<"search" | "analysis">("search");
   const [activeGrammarMatch, setActiveGrammarMatch] = useState<GrammarMatch | null>(null);
   const [grammarAnchor, setGrammarAnchor] = useState<{ top: number; left: number } | null>(null);
   const [textareaEl, setTextareaEl] = useState<HTMLTextAreaElement | null>(null);
@@ -52,11 +60,16 @@ export function WritingWorkspace() {
   const selectionStart = ui.selectionRange.start;
 
   const analysis = useLineAnalysis(text, selectionStart, footPreset);
-  const { matches: grammarMatches } = useGrammarCheck(
-    text,
-    language,
-    grammarCheckEnabled
-  );
+  const {
+    matches: grammarMatches,
+    loading: grammarLoading,
+    error: grammarError,
+  } = useGrammarCheck(text, language, grammarCheckEnabled);
+
+  const setGrammarEnabled = useCallback((enabled: boolean) => {
+    setGrammarCheckEnabled(enabled);
+    localStorage.setItem(GRAMMAR_STORAGE_KEY, enabled ? "1" : "0");
+  }, []);
 
   const selectedWord = useMemo(
     () =>
@@ -152,12 +165,31 @@ export function WritingWorkspace() {
           onTyping={handleTyping}
           onBlur={handleBlur}
           placeholder={t("beginWriting")}
+          grammarCheckEnabled={grammarCheckEnabled}
           grammarMatches={grammarMatches}
           onGrammarMatchSelect={(match, rect) => {
             setActiveGrammarMatch(match);
             setGrammarAnchor({ top: rect.bottom, left: rect.left });
           }}
+          onGrammarClear={() => {
+            setActiveGrammarMatch(null);
+            setGrammarAnchor(null);
+          }}
         />
+        {grammarCheckEnabled && (
+          <p
+            className="mx-auto mt-3 max-w-2xl px-1 text-center font-[family-name:var(--font-ui)] text-[10px] text-[var(--muted)]"
+            data-testid="grammar-status"
+          >
+            {grammarLoading
+              ? t("grammarChecking")
+              : grammarError
+                ? t("grammarError")
+                : grammarMatches.length > 0
+                  ? `${grammarMatches.length} ${t("grammarIssues")} — ${t("grammarCheckHint")}`
+                  : t("grammarCheckHint")}
+          </p>
+        )}
       </main>
 
       <SlideDrawer
@@ -199,8 +231,13 @@ export function WritingWorkspace() {
           onClose={() => ui.setInspectorOpen(false)}
           language={language}
           t={t}
+          tab={inspectorTab}
+          onTabChange={setInspectorTab}
           grammarCheckEnabled={grammarCheckEnabled}
-          onGrammarCheckEnabledChange={setGrammarCheckEnabled}
+          onGrammarCheckEnabledChange={setGrammarEnabled}
+          grammarLoading={grammarLoading}
+          grammarError={grammarError}
+          grammarIssueCount={grammarMatches.length}
         />
       </SlideDrawer>
 
@@ -217,6 +254,7 @@ export function WritingWorkspace() {
       <SelectionPopover
         word={selectedWord}
         anchor={selectionAnchor}
+        language={language}
         onSearchMore={(w) => ui.openCommandPalette(w)}
         onClose={() =>
           ui.setSelectionRange({ start: selectionStart, end: selectionStart })
@@ -225,6 +263,7 @@ export function WritingWorkspace() {
           searchMore: t("searchMore"),
           noQuickMatches: t("noQuickMatches"),
           findingRhymes: t("findingRhymes"),
+          sylSuffix: t("sylSuffix"),
         }}
       />
 
@@ -232,6 +271,7 @@ export function WritingWorkspace() {
         match={activeGrammarMatch}
         anchor={grammarAnchor}
         replaceLabel={t("grammarReplace")}
+        noSuggestionsLabel={t("grammarNoSuggestions")}
         onReplace={handleGrammarReplace}
         onClose={() => {
           setActiveGrammarMatch(null);
@@ -242,8 +282,23 @@ export function WritingWorkspace() {
       <BottomToolbar
         visible={toolbarVisible && !ui.anyOverlayOpen && !selectedWord && !activeGrammarMatch}
         onOpenCommand={() => ui.openCommandPalette()}
-        onOpenInspector={ui.toggleInspector}
+        onOpenInspector={() => {
+          setInspectorTab("analysis");
+          ui.toggleInspector();
+        }}
+        onToggleGrammar={() => {
+          const next = !grammarCheckEnabled;
+          setGrammarEnabled(next);
+          if (next) {
+            setInspectorTab("analysis");
+          }
+        }}
+        grammarCheckEnabled={grammarCheckEnabled}
+        grammarIssueCount={grammarMatches.length}
+        grammarLoading={grammarLoading}
         searchLabel={t("search")}
+        grammarLabel={t("grammarCheck")}
+        inspectorLabel={t("analysis")}
       />
     </div>
   );

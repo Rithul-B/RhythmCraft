@@ -2,6 +2,8 @@
 
 import { useEffect, useState } from "react";
 import { countWordSyllables } from "@/lib/syllables";
+import { fetchFreeDictionarySynonyms } from "@/lib/freeDictionary";
+import { hasFullWordSearch, type AppLanguage } from "@/lib/i18n/languages";
 import type { WordResult } from "@/lib/datamuse";
 
 const EMPTY_RESULTS: WordResult[] = [];
@@ -9,24 +11,25 @@ const EMPTY_RESULTS: WordResult[] = [];
 interface SelectionPopoverProps {
   word: string | null;
   anchor: { top: number; left: number } | null;
+  language: AppLanguage;
   onSearchMore: (word: string) => void;
   onClose: () => void;
   labels?: {
     searchMore?: string;
     noQuickMatches?: string;
     findingRhymes?: string;
+    sylSuffix?: string;
   };
 }
 
 export function SelectionPopover({
   word,
   anchor,
+  language,
   onSearchMore,
   onClose,
   labels = {},
 }: SelectionPopoverProps) {
-  // Results are stored with the word they belong to, so both the stale-result flash and a
-  // superseded request clearing the spinner are impossible by construction.
   const [fetched, setFetched] = useState<{ word: string; items: WordResult[] } | null>(null);
 
   useEffect(() => {
@@ -34,19 +37,36 @@ export function SelectionPopover({
 
     const controller = new AbortController();
 
-    fetch(`/api/words?q=${encodeURIComponent(word)}&max=10`, {
-      signal: controller.signal,
-    })
-      .then((r) => r.json())
-      .then((data: { words: WordResult[] }) => {
-        setFetched({ word, items: (data.words ?? []).slice(0, 5) });
-      })
-      .catch(() => {
-        if (!controller.signal.aborted) setFetched({ word, items: [] });
-      });
+    async function load() {
+      try {
+        if (!hasFullWordSearch(language)) {
+          const synonyms = await fetchFreeDictionarySynonyms(
+            word!,
+            language as "fr" | "de" | "it",
+            controller.signal
+          );
+          if (!controller.signal.aborted) {
+            setFetched({ word: word!, items: synonyms.slice(0, 5) });
+          }
+          return;
+        }
 
+        const res = await fetch(
+          `/api/words?q=${encodeURIComponent(word!)}&max=10&lang=${language}`,
+          { signal: controller.signal }
+        );
+        const data = (await res.json()) as { words: WordResult[] };
+        if (!controller.signal.aborted) {
+          setFetched({ word: word!, items: (data.words ?? []).slice(0, 5) });
+        }
+      } catch {
+        if (!controller.signal.aborted) setFetched({ word: word!, items: [] });
+      }
+    }
+
+    void load();
     return () => controller.abort();
-  }, [word]);
+  }, [word, language]);
 
   const hasResultsForWord = fetched?.word === word;
   const results = hasResultsForWord ? fetched.items : EMPTY_RESULTS;
@@ -73,7 +93,8 @@ export function SelectionPopover({
             {word}
           </span>
           <span className="font-mono text-[10px] text-[var(--muted-light)]">
-            {syllables}syl
+            {syllables}
+            {labels.sylSuffix ?? "syl"}
           </span>
         </div>
 

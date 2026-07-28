@@ -16,6 +16,7 @@ export function useGrammarCheck(
     text: string;
     language: AppLanguage;
     matches: GrammarMatch[];
+    error: boolean;
   } | null>(null);
   const [loading, setLoading] = useState(false);
 
@@ -34,11 +35,16 @@ export function useGrammarCheck(
         });
         const data = (await res.json()) as GrammarCheckResult;
         if (!controller.signal.aborted) {
-          setFetched({ text, language, matches: data.matches ?? EMPTY });
+          setFetched({
+            text,
+            language,
+            matches: data.matches ?? EMPTY,
+            error: data.source === "error" || !res.ok,
+          });
         }
       } catch (err) {
         if ((err as Error).name !== "AbortError" && !controller.signal.aborted) {
-          setFetched({ text, language, matches: EMPTY });
+          setFetched({ text, language, matches: EMPTY, error: true });
         }
       } finally {
         if (!controller.signal.aborted) setLoading(false);
@@ -56,5 +62,10 @@ export function useGrammarCheck(
       ? fetched.matches
       : EMPTY;
 
-  return { matches, loading: enabled && loading };
+  const error =
+    enabled && fetched && fetched.text === text && fetched.language === language
+      ? fetched.error
+      : false;
+
+  return { matches, loading: enabled && loading, error };
 }

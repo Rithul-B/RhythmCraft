@@ -1,6 +1,5 @@
 "use client";
 
-import { useState } from "react";
 import { Search, BarChart3, X } from "lucide-react";
 import { RhythmRhymeFinder } from "./RhythmRhymeFinder";
 import { LineAnalysis } from "./LineAnalysis";
@@ -21,8 +20,13 @@ interface InspectorDrawerProps {
   onClose: () => void;
   language: AppLanguage;
   t: (key: TranslationKey) => string;
+  tab: Tab;
+  onTabChange: (tab: Tab) => void;
   grammarCheckEnabled: boolean;
   onGrammarCheckEnabledChange: (value: boolean) => void;
+  grammarLoading?: boolean;
+  grammarError?: boolean;
+  grammarIssueCount?: number;
 }
 
 export function InspectorDrawer({
@@ -35,18 +39,21 @@ export function InspectorDrawer({
   onClose,
   language,
   t,
+  tab,
+  onTabChange,
   grammarCheckEnabled,
   onGrammarCheckEnabledChange,
+  grammarLoading = false,
+  grammarError = false,
+  grammarIssueCount = 0,
 }: InspectorDrawerProps) {
-  const [tab, setTab] = useState<Tab>("search");
-
   return (
     <div className="flex h-full flex-col font-[family-name:var(--font-ui)]" data-testid="inspector-drawer">
       <div className="flex items-center justify-between px-4 py-4">
         <div className="flex gap-1.5">
           <button
             type="button"
-            onClick={() => setTab("search")}
+            onClick={() => onTabChange("search")}
             className={`zen-pill flex min-h-11 items-center gap-2 rounded-full px-4 py-2 text-xs transition-all duration-300 md:min-h-0 ${
               tab === "search"
                 ? "zen-pill-active bg-[var(--text)] text-[var(--bg)] ring-2 ring-[var(--glow-active)]"
@@ -58,7 +65,7 @@ export function InspectorDrawer({
           </button>
           <button
             type="button"
-            onClick={() => setTab("analysis")}
+            onClick={() => onTabChange("analysis")}
             className={`zen-pill flex min-h-11 items-center gap-2 rounded-full px-4 py-2 text-xs transition-all duration-300 md:min-h-0 ${
               tab === "analysis"
                 ? "zen-pill-active bg-[var(--text)] text-[var(--bg)] ring-2 ring-[var(--glow-active)]"
@@ -103,6 +110,17 @@ export function InspectorDrawer({
                   <span className="mt-1 block text-[10px] text-[var(--muted)]">
                     {t("grammarCheckHint")}
                   </span>
+                  {grammarCheckEnabled && (
+                    <span className="mt-2 block text-[10px] text-[var(--muted)]">
+                      {grammarLoading
+                        ? t("grammarChecking")
+                        : grammarError
+                          ? t("grammarError")
+                          : grammarIssueCount > 0
+                            ? `${grammarIssueCount} ${t("grammarIssues")}`
+                            : null}
+                    </span>
+                  )}
                 </span>
               </label>
             </div>

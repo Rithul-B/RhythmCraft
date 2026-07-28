@@ -111,21 +111,20 @@ export function LineAnalysis({
           poeticPacing: t("poeticPacing"),
           unavailable: t("speechUnavailable"),
           stanza: t("stanza"),
+          defaultVoice: t("defaultVoice"),
         }}
       />
 
       {!activeStats || !activeStats.text.trim() ? (
         <div className="flex flex-col items-center justify-center py-8 text-center">
           <BarChart3 className="mb-4 h-8 w-8 text-[var(--muted-light)]" strokeWidth={1.5} />
-          <p className="text-sm text-[var(--muted)]">
-            Place your cursor on a line to analyze its rhythm.
-          </p>
+          <p className="text-sm text-[var(--muted)]">{t("placeCursor")}</p>
         </div>
       ) : (
         <>
           <div>
             <p className="mb-1 text-[10px] tracking-[0.2em] text-[var(--muted-light)] uppercase">
-              Line {activeLineIndex + 1}
+              {t("lineN").replace("{n}", String(activeLineIndex + 1))}
             </p>
             <p className="text-sm italic text-[var(--muted)]">
               &ldquo;{activeStats.text}&rdquo;
@@ -143,28 +142,26 @@ export function LineAnalysis({
 
           <div>
             <p className="mb-2 text-[10px] tracking-[0.2em] text-[var(--muted-light)] uppercase">
-              Stress pattern
+              {t("stressPattern")}
             </p>
             <p className="rounded-2xl bg-[var(--surface-raised)]/70 px-5 py-4 font-mono text-base tracking-widest text-[var(--accent)] shadow-sm">
               {activeStats.stressPattern || "—"}
             </p>
-            <p className="mt-2 text-[10px] text-[var(--muted-light)]">
-              u = unstressed &nbsp;·&nbsp; / = stressed
-            </p>
+            <p className="mt-2 text-[10px] text-[var(--muted-light)]">{t("stressLegend")}</p>
           </div>
 
           {activeStats.words.length > 0 && (
             <div>
               <p className="mb-2 text-[10px] tracking-[0.2em] text-[var(--muted-light)] uppercase">
-                Word breakdown
+                {t("wordBreakdown")}
               </p>
               <div className="overflow-hidden rounded-2xl bg-[var(--surface-raised)]/60 shadow-sm">
                 <table className="w-full text-sm">
                   <thead>
                     <tr className="text-left text-xs text-[var(--muted-light)]">
-                      <th className="px-4 py-2.5 font-normal">Word</th>
-                      <th className="px-4 py-2.5 font-normal">Syl</th>
-                      <th className="px-4 py-2.5 font-normal">Stress</th>
+                      <th className="px-4 py-2.5 font-normal">{t("colWord")}</th>
+                      <th className="px-4 py-2.5 font-normal">{t("colSyl")}</th>
+                      <th className="px-4 py-2.5 font-normal">{t("colStress")}</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -191,7 +188,9 @@ export function LineAnalysis({
           <span>
             {stanzaLineCount} {stanzaLineCount === 1 ? t("line") : t("lines")}
           </span>
-          <span>{avgSyllablesPerLine.toFixed(1)} avg syl/line</span>
+          <span>
+            {avgSyllablesPerLine.toFixed(1)} {t("avgSylLine")}
+          </span>
         </div>
       </div>
     </div>

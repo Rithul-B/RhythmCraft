@@ -22,6 +22,7 @@ interface CadenceReaderProps {
     poeticPacing?: string;
     unavailable?: string;
     stanza?: string;
+    defaultVoice?: string;
   };
 }
 
@@ -110,6 +111,7 @@ export function CadenceReader({ text, labels = {} }: CadenceReaderProps) {
             voice: labels.voice ?? "Voice",
             pitch: labels.pitch ?? "Pitch",
             poeticPacing: labels.poeticPacing ?? "Poetic pacing",
+            defaultVoice: labels.defaultVoice ?? "Default",
           }}
         />
 

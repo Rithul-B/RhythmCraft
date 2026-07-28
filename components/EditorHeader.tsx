@@ -74,13 +74,26 @@ export function EditorHeader({
         >
           <PanelRight className="h-4 w-4" strokeWidth={1.5} />
         </button>
-        <ExportMenu text={text} title={poemTitle} rhymeScheme={rhymeScheme} exportLabel={t("export")} />
+        <ExportMenu
+          text={text}
+          title={poemTitle}
+          rhymeScheme={rhymeScheme}
+          exportLabel={t("export")}
+          downloadTxtLabel={t("downloadTxt")}
+          downloadPdfLabel={t("downloadPdf")}
+        />
         <LanguageSelector
           language={language}
           onLanguageChange={onLanguageChange}
           label={t("language")}
         />
-        <ThemeSwitcher theme={theme} onThemeChange={onThemeChange} />
+        <ThemeSwitcher
+          theme={theme}
+          onThemeChange={onThemeChange}
+          changeThemeLabel={t("changeTheme")}
+          parchmentLabel={t("themeParchment")}
+          midnightLabel={t("themeMidnight")}
+        />
       </div>
     </header>
   );

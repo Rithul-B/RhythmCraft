@@ -149,6 +149,10 @@ test.describe("RhythmCraft v3.0", () => {
     await expect(
       page.getByTestId("command-palette").getByPlaceholder(/Buscar rimas/i)
     ).toBeVisible({ timeout: 8_000 });
+    await page.keyboard.press("Escape");
+    await page.keyboard.press("Control+i");
+    await page.getByTestId("inspector-drawer").getByRole("button", { name: /Análisis/i }).click();
+    await expect(page.getByText(/Coloca el cursor/i)).toBeVisible();
   });
 
   test("7. Emoji suggestions appear for night", async ({ page }) => {
@@ -161,22 +165,32 @@ test.describe("RhythmCraft v3.0", () => {
     await expect(page.getByTestId("emoji-suggestions")).toContainText("🌙");
   });
 
-  test("8. Grammar check toggle flags misspelling", async ({ page }) => {
+  test("8. Grammar check toggle flags misspelling and allows replace", async ({ page }) => {
     const editor = page.getByTestId("poetry-editor");
     await editor.fill("This is an test of grammer.");
 
-    await page.keyboard.press("Control+i");
-    const drawer = page.getByTestId("inspector-drawer");
-    await expect(drawer).toBeVisible();
-    await drawer.getByRole("button", { name: /Analysis|Análisis|Analyse|Analisi/i }).click();
-    await expect(drawer.getByTestId("grammar-check-toggle")).toBeVisible({ timeout: 5_000 });
-    await drawer.getByTestId("grammar-check-toggle").check();
+    await page.getByTestId("grammar-toolbar-toggle").click();
+    await expect(page.getByTestId("grammar-status")).toBeVisible({ timeout: 5_000 });
 
     await expect
-      .poll(async () => {
-        return page.locator("[data-grammar-match]").count();
-      }, { timeout: 25_000 })
+      .poll(async () => page.locator("[data-grammar-match]").count(), { timeout: 25_000 })
       .toBeGreaterThan(0);
+
+    // Click near the misspelled word; caret hit-testing opens the tooltip.
+    await editor.click({ position: { x: 200, y: 40 } });
+    await editor.evaluate((el) => {
+      const textarea = el as HTMLTextAreaElement;
+      const idx = textarea.value.indexOf("grammer");
+      if (idx >= 0) {
+        textarea.focus();
+        textarea.setSelectionRange(idx + 2, idx + 2);
+        textarea.dispatchEvent(new MouseEvent("mouseup", { bubbles: true }));
+      }
+    });
+
+    await expect(page.getByTestId("grammar-tooltip")).toBeVisible({ timeout: 8_000 });
+    await page.getByTestId("grammar-tooltip").getByRole("button").first().click();
+    await expect(editor).not.toHaveValue(/grammer/);
   });
 
   test("9. Mobile viewport shows bottom sheet drawer", async ({ page }) => {

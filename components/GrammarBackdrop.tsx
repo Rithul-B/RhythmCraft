@@ -6,7 +6,6 @@ import { editorTextStyles } from "./editorStyles";
 interface GrammarBackdropProps {
   text: string;
   matches: GrammarMatch[];
-  onSelectMatch?: (match: GrammarMatch, rect: DOMRect) => void;
 }
 
 function categoryClass(category: GrammarMatch["category"]): string {
@@ -19,7 +18,11 @@ function categoryClass(category: GrammarMatch["category"]): string {
   return "decoration-wavy decoration-sky-400/70 underline decoration-2 underline-offset-[5px]";
 }
 
-export function GrammarBackdrop({ text, matches, onSelectMatch }: GrammarBackdropProps) {
+/**
+ * Visual-only overlay. Clicks are handled by PoetryEditor via caret hit-testing
+ * because the textarea must stay on top for typing.
+ */
+export function GrammarBackdrop({ text, matches }: GrammarBackdropProps) {
   if (!text || matches.length === 0) {
     return (
       <div
@@ -69,20 +72,7 @@ export function GrammarBackdrop({ text, matches, onSelectMatch }: GrammarBackdro
           <span
             key={index}
             data-grammar-match={segment.match.category}
-            className={`pointer-events-auto cursor-pointer text-transparent ${categoryClass(segment.match.category)}`}
-            onClick={(e) => {
-              e.preventDefault();
-              e.stopPropagation();
-              onSelectMatch?.(segment.match!, e.currentTarget.getBoundingClientRect());
-            }}
-            onKeyDown={(e) => {
-              if (e.key === "Enter" || e.key === " ") {
-                e.preventDefault();
-                onSelectMatch?.(segment.match!, e.currentTarget.getBoundingClientRect());
-              }
-            }}
-            role="button"
-            tabIndex={0}
+            className={`text-transparent ${categoryClass(segment.match.category)}`}
             title={segment.match.shortMessage}
           >
             {segment.text}

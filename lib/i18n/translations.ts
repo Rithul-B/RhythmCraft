@@ -54,8 +54,16 @@ export type TranslationKey =
   | "grammarCheck"
   | "grammarCheckHint"
   | "grammarReplace"
+  | "grammarNoSuggestions"
+  | "grammarChecking"
+  | "grammarError"
+  | "grammarIssues"
   | "export"
+  | "downloadTxt"
+  | "downloadPdf"
   | "changeTheme"
+  | "themeParchment"
+  | "themeMidnight"
   | "language"
   | "beginWriting"
   | "closeNotebooks"
@@ -63,7 +71,20 @@ export type TranslationKey =
   | "closeSearch"
   | "searchRhymesSynonyms"
   | "stanza"
-  | "searchCmdK";
+  | "searchCmdK"
+  | "placeCursor"
+  | "lineN"
+  | "stressPattern"
+  | "stressLegend"
+  | "wordBreakdown"
+  | "colWord"
+  | "colSyl"
+  | "colStress"
+  | "avgSylLine"
+  | "copy"
+  | "copied"
+  | "defaultVoice"
+  | "sylSuffix";
 
 type Dictionary = Record<TranslationKey, string>;
 
@@ -103,7 +124,7 @@ const en: Dictionary = {
   emojis: "Emojis",
   searchMore: "Search more →",
   noQuickMatches: "No quick matches",
-  findingRhymes: "Finding rhymes...",
+  findingRhymes: "Finding matches...",
   rhymeScheme: "Rhyme scheme",
   meterSummary: "Meter summary",
   prevailingMeter: "Prevailing meter",
@@ -119,10 +140,18 @@ const en: Dictionary = {
   poeticPacing: "Poetic pacing",
   speechUnavailable: "Speech synthesis is not available in this browser.",
   grammarCheck: "Spelling & grammar",
-  grammarCheckHint: "Sends your poem text to LanguageTool while enabled.",
+  grammarCheckHint: "Sends your poem text to LanguageTool while enabled. Click a wavy underline to fix.",
   grammarReplace: "Replace",
+  grammarNoSuggestions: "No suggestions",
+  grammarChecking: "Checking spelling & grammar…",
+  grammarError: "Couldn’t reach LanguageTool. Try again in a moment.",
+  grammarIssues: "issues",
   export: "Export",
+  downloadTxt: "Download .txt",
+  downloadPdf: "Download .pdf",
   changeTheme: "Change theme",
+  themeParchment: "Cream Parchment",
+  themeMidnight: "Obsidian Dark",
   language: "Language",
   beginWriting: "Begin writing your verse...",
   closeNotebooks: "Close notebooks",
@@ -131,6 +160,19 @@ const en: Dictionary = {
   searchRhymesSynonyms: "Search rhymes & synonyms",
   stanza: "Stanza",
   searchCmdK: "Search ⌘K",
+  placeCursor: "Place your cursor on a line to analyze its rhythm.",
+  lineN: "Line {n}",
+  stressPattern: "Stress pattern",
+  stressLegend: "u = unstressed · / = stressed",
+  wordBreakdown: "Word breakdown",
+  colWord: "Word",
+  colSyl: "Syl",
+  colStress: "Stress",
+  avgSylLine: "avg syl/line",
+  copy: "Copy",
+  copied: "Copied",
+  defaultVoice: "Default",
+  sylSuffix: "syl",
 };
 
 const es: Dictionary = {
@@ -159,6 +201,10 @@ const es: Dictionary = {
   toneModern: "Moderno / Crudo",
   toneSlang: "Jerga / Vernáculo",
   footAny: "Cualquiera",
+  footIambic: "Yámbico",
+  footTrochaic: "Trocaico",
+  footAnapestic: "Anapéstico",
+  footDactylic: "Dactílico",
   enterWord: "Escribe una palabra para encontrar rimas y sinónimos.",
   noMatches: "Ninguna palabra coincide con tus filtros.",
   offlineSuggestions: "Usando sugerencias sin conexión",
@@ -166,7 +212,7 @@ const es: Dictionary = {
   emojis: "Emojis",
   searchMore: "Buscar más →",
   noQuickMatches: "Sin coincidencias rápidas",
-  findingRhymes: "Buscando rimas...",
+  findingRhymes: "Buscando coincidencias...",
   rhymeScheme: "Esquema de rima",
   meterSummary: "Resumen métrico",
   prevailingMeter: "Metro predominante",
@@ -182,10 +228,18 @@ const es: Dictionary = {
   poeticPacing: "Ritmo poético",
   speechUnavailable: "La síntesis de voz no está disponible en este navegador.",
   grammarCheck: "Ortografía y gramática",
-  grammarCheckHint: "Envía el texto del poema a LanguageTool mientras está activado.",
+  grammarCheckHint: "Envía el texto del poema a LanguageTool mientras está activado. Pulsa un subrayado ondulado para corregir.",
   grammarReplace: "Reemplazar",
+  grammarNoSuggestions: "Sin sugerencias",
+  grammarChecking: "Revisando ortografía y gramática…",
+  grammarError: "No se pudo contactar LanguageTool. Inténtalo de nuevo.",
+  grammarIssues: "problemas",
   export: "Exportar",
+  downloadTxt: "Descargar .txt",
+  downloadPdf: "Descargar .pdf",
   changeTheme: "Cambiar tema",
+  themeParchment: "Pergamino crema",
+  themeMidnight: "Obsidiana oscura",
   language: "Idioma",
   beginWriting: "Comienza a escribir tu verso...",
   closeNotebooks: "Cerrar cuadernos",
@@ -194,6 +248,19 @@ const es: Dictionary = {
   searchRhymesSynonyms: "Buscar rimas y sinónimos",
   stanza: "Estrofa",
   searchCmdK: "Buscar ⌘K",
+  placeCursor: "Coloca el cursor en una línea para analizar su ritmo.",
+  lineN: "Línea {n}",
+  stressPattern: "Patrón de acentos",
+  stressLegend: "u = átona · / = tónica",
+  wordBreakdown: "Desglose de palabras",
+  colWord: "Palabra",
+  colSyl: "Sílabas",
+  colStress: "Acento",
+  avgSylLine: "síl. media/línea",
+  copy: "Copiar",
+  copied: "Copiado",
+  defaultVoice: "Predeterminada",
+  sylSuffix: "síl",
 };
 
 const fr: Dictionary = {
@@ -222,6 +289,10 @@ const fr: Dictionary = {
   toneModern: "Moderne / Brut",
   toneSlang: "Argot / Vernaculaire",
   footAny: "Tous",
+  footIambic: "Iambique",
+  footTrochaic: "Trochaïque",
+  footAnapestic: "Anapestique",
+  footDactylic: "Dactylique",
   enterWord: "Entrez un mot pour trouver rimes et synonymes.",
   noMatches: "Aucun mot ne correspond à vos filtres.",
   offlineSuggestions: "Suggestions hors ligne",
@@ -229,7 +300,7 @@ const fr: Dictionary = {
   emojis: "Emojis",
   searchMore: "Chercher plus →",
   noQuickMatches: "Pas de correspondances rapides",
-  findingRhymes: "Recherche de rimes...",
+  findingRhymes: "Recherche en cours...",
   rhymeScheme: "Schéma de rimes",
   meterSummary: "Résumé métrique",
   prevailingMeter: "Mètre dominant",
@@ -245,10 +316,18 @@ const fr: Dictionary = {
   poeticPacing: "Rythme poétique",
   speechUnavailable: "La synthèse vocale n'est pas disponible dans ce navigateur.",
   grammarCheck: "Orthographe et grammaire",
-  grammarCheckHint: "Envoie le texte du poème à LanguageTool lorsqu'activé.",
+  grammarCheckHint: "Envoie le texte du poème à LanguageTool lorsqu'activé. Cliquez un soulignement ondulé pour corriger.",
   grammarReplace: "Remplacer",
+  grammarNoSuggestions: "Aucune suggestion",
+  grammarChecking: "Vérification de l'orthographe et de la grammaire…",
+  grammarError: "Impossible de joindre LanguageTool. Réessayez dans un instant.",
+  grammarIssues: "problèmes",
   export: "Exporter",
+  downloadTxt: "Télécharger .txt",
+  downloadPdf: "Télécharger .pdf",
   changeTheme: "Changer de thème",
+  themeParchment: "Parchemin crème",
+  themeMidnight: "Obsidienne sombre",
   language: "Langue",
   beginWriting: "Commencez à écrire votre vers...",
   closeNotebooks: "Fermer les carnets",
@@ -257,6 +336,19 @@ const fr: Dictionary = {
   searchRhymesSynonyms: "Rechercher rimes et synonymes",
   stanza: "Strophe",
   searchCmdK: "Rechercher ⌘K",
+  placeCursor: "Placez le curseur sur une ligne pour analyser son rythme.",
+  lineN: "Ligne {n}",
+  stressPattern: "Schéma d'accents",
+  stressLegend: "u = inaccentué · / = accentué",
+  wordBreakdown: "Décomposition des mots",
+  colWord: "Mot",
+  colSyl: "Syl",
+  colStress: "Accent",
+  avgSylLine: "syl. moy./ligne",
+  copy: "Copier",
+  copied: "Copié",
+  defaultVoice: "Par défaut",
+  sylSuffix: "syl",
 };
 
 const de: Dictionary = {
@@ -281,10 +373,14 @@ const de: Dictionary = {
   toneEthereal: "Ätherisch",
   toneGothic: "Gotisch",
   toneUplifting: "Erhebend",
-  toneArchaic: "Archaïsch",
+  toneArchaic: "Archaisch",
   toneModern: "Modern / Roh",
   toneSlang: "Slang / Umgangssprache",
   footAny: "Beliebig",
+  footIambic: "Jambisch",
+  footTrochaic: "Trochäisch",
+  footAnapestic: "Anapästisch",
+  footDactylic: "Daktylisch",
   enterWord: "Gib ein Wort ein, um Reime und Synonyme zu finden.",
   noMatches: "Keine Wörter passen zu deinen Filtern.",
   offlineSuggestions: "Offline-Vorschläge",
@@ -292,7 +388,7 @@ const de: Dictionary = {
   emojis: "Emojis",
   searchMore: "Mehr suchen →",
   noQuickMatches: "Keine schnellen Treffer",
-  findingRhymes: "Reime werden gesucht...",
+  findingRhymes: "Suche läuft...",
   rhymeScheme: "Reimschema",
   meterSummary: "Metrische Übersicht",
   prevailingMeter: "Vorherrschendes Metrum",
@@ -308,10 +404,18 @@ const de: Dictionary = {
   poeticPacing: "Poetisches Tempo",
   speechUnavailable: "Sprachsynthese ist in diesem Browser nicht verfügbar.",
   grammarCheck: "Rechtschreibung & Grammatik",
-  grammarCheckHint: "Sendet den Gedichttext an LanguageTool, solange aktiviert.",
+  grammarCheckHint: "Sendet den Gedichttext an LanguageTool, solange aktiviert. Tippe auf eine Wellenlinie zum Korrigieren.",
   grammarReplace: "Ersetzen",
+  grammarNoSuggestions: "Keine Vorschläge",
+  grammarChecking: "Rechtschreibung & Grammatik werden geprüft…",
+  grammarError: "LanguageTool nicht erreichbar. Bitte gleich nochmal versuchen.",
+  grammarIssues: "Probleme",
   export: "Exportieren",
+  downloadTxt: ".txt herunterladen",
+  downloadPdf: ".pdf herunterladen",
   changeTheme: "Thema ändern",
+  themeParchment: "Cremepergament",
+  themeMidnight: "Obsidian Dunkel",
   language: "Sprache",
   beginWriting: "Beginne, deinen Vers zu schreiben...",
   closeNotebooks: "Notizbücher schließen",
@@ -320,6 +424,19 @@ const de: Dictionary = {
   searchRhymesSynonyms: "Reime und Synonyme suchen",
   stanza: "Strophe",
   searchCmdK: "Suchen ⌘K",
+  placeCursor: "Setze den Cursor auf eine Zeile, um den Rhythmus zu analysieren.",
+  lineN: "Zeile {n}",
+  stressPattern: "Betonungsmuster",
+  stressLegend: "u = unbetont · / = betont",
+  wordBreakdown: "Wortaufschlüsselung",
+  colWord: "Wort",
+  colSyl: "Sil",
+  colStress: "Betonung",
+  avgSylLine: "Silben ø/Zeile",
+  copy: "Kopieren",
+  copied: "Kopiert",
+  defaultVoice: "Standard",
+  sylSuffix: "Sil",
 };
 
 const it: Dictionary = {
@@ -348,6 +465,10 @@ const it: Dictionary = {
   toneModern: "Moderno / Grezzo",
   toneSlang: "Slang / Vernacolo",
   footAny: "Qualsiasi",
+  footIambic: "Giambico",
+  footTrochaic: "Trocaico",
+  footAnapestic: "Anapestico",
+  footDactylic: "Dattilico",
   enterWord: "Inserisci una parola per trovare rime e sinonimi.",
   noMatches: "Nessuna parola corrisponde ai tuoi filtri.",
   offlineSuggestions: "Suggerimenti offline",
@@ -355,7 +476,7 @@ const it: Dictionary = {
   emojis: "Emoji",
   searchMore: "Cerca di più →",
   noQuickMatches: "Nessuna corrispondenza rapida",
-  findingRhymes: "Ricerca rime...",
+  findingRhymes: "Ricerca in corso...",
   rhymeScheme: "Schema delle rime",
   meterSummary: "Riepilogo metrico",
   prevailingMeter: "Metro prevalente",
@@ -371,10 +492,18 @@ const it: Dictionary = {
   poeticPacing: "Ritmo poetico",
   speechUnavailable: "La sintesi vocale non è disponibile in questo browser.",
   grammarCheck: "Ortografia e grammatica",
-  grammarCheckHint: "Invia il testo della poesia a LanguageTool mentre è attivo.",
+  grammarCheckHint: "Invia il testo della poesia a LanguageTool mentre è attivo. Tocca una sottolineatura ondulata per correggere.",
   grammarReplace: "Sostituisci",
+  grammarNoSuggestions: "Nessun suggerimento",
+  grammarChecking: "Controllo ortografia e grammatica…",
+  grammarError: "Impossibile raggiungere LanguageTool. Riprova tra poco.",
+  grammarIssues: "problemi",
   export: "Esporta",
+  downloadTxt: "Scarica .txt",
+  downloadPdf: "Scarica .pdf",
   changeTheme: "Cambia tema",
+  themeParchment: "Pergamena crema",
+  themeMidnight: "Ossidiana scura",
   language: "Lingua",
   beginWriting: "Inizia a scrivere il tuo verso...",
   closeNotebooks: "Chiudi quaderni",
@@ -383,6 +512,19 @@ const it: Dictionary = {
   searchRhymesSynonyms: "Cerca rime e sinonimi",
   stanza: "Strofa",
   searchCmdK: "Cerca ⌘K",
+  placeCursor: "Metti il cursore su una riga per analizzarne il ritmo.",
+  lineN: "Riga {n}",
+  stressPattern: "Schema degli accenti",
+  stressLegend: "u = atona · / = tonica",
+  wordBreakdown: "Scomposizione delle parole",
+  colWord: "Parola",
+  colSyl: "Sil",
+  colStress: "Accento",
+  avgSylLine: "sil. medie/riga",
+  copy: "Copia",
+  copied: "Copiato",
+  defaultVoice: "Predefinita",
+  sylSuffix: "sil",
 };
 
 const DICTIONARIES: Record<AppLanguage, Dictionary> = { en, es, fr, de, it };

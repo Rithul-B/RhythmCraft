@@ -14,6 +14,7 @@ interface VoiceReaderControlsProps {
     voice: string;
     pitch: string;
     poeticPacing: string;
+    defaultVoice?: string;
   };
 }
 
@@ -39,7 +40,7 @@ export function VoiceReaderControls({
           className="min-h-11 w-full rounded-xl border border-[var(--glass-border)] bg-[var(--surface)] px-3 py-2 text-xs text-[var(--text)] md:min-h-0"
         >
           {voices.length === 0 ? (
-            <option value="">Default</option>
+            <option value="">{labels.defaultVoice ?? "Default"}</option>
           ) : (
             voices.map((v) => (
               <option key={v.voiceURI} value={v.voiceURI}>

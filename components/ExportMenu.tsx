@@ -10,9 +10,18 @@ interface ExportMenuProps {
   title: string;
   rhymeScheme: RhymeSchemeResult;
   exportLabel?: string;
+  downloadTxtLabel?: string;
+  downloadPdfLabel?: string;
 }
 
-export function ExportMenu({ text, title, rhymeScheme, exportLabel = "Export" }: ExportMenuProps) {
+export function ExportMenu({
+  text,
+  title,
+  rhymeScheme,
+  exportLabel = "Export",
+  downloadTxtLabel = "Download .txt",
+  downloadPdfLabel = "Download .pdf",
+}: ExportMenuProps) {
   const [open, setOpen] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
 
@@ -59,7 +68,7 @@ export function ExportMenu({ text, title, rhymeScheme, exportLabel = "Export" }:
             }}
             className="block w-full rounded-xl px-3 py-2 text-left text-xs text-[var(--muted)] hover:bg-[var(--surface)]"
           >
-            Download .txt
+            {downloadTxtLabel}
           </button>
           <button
             type="button"
@@ -69,7 +78,7 @@ export function ExportMenu({ text, title, rhymeScheme, exportLabel = "Export" }:
             }}
             className="block w-full rounded-xl px-3 py-2 text-left text-xs text-[var(--muted)] hover:bg-[var(--surface)]"
           >
-            Download .pdf
+            {downloadPdfLabel}
           </button>
         </div>
       )}
