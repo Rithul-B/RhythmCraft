@@ -50,7 +50,7 @@ test.describe("Rhythmic Thesaurus v2.5 — Editorial Zen", () => {
 
     const searchInput = page
       .getByTestId("command-palette")
-      .getByPlaceholder("Search rhymes & synonyms...");
+      .getByPlaceholder(/Search rhymes|Buscar rimas|Rechercher|Reime|Cerca rime/i);
     await searchInput.fill("friend");
 
     await expect(
@@ -65,7 +65,7 @@ test.describe("Rhythmic Thesaurus v2.5 — Editorial Zen", () => {
     await page.keyboard.press("Control+\\");
     await expect(page.getByTestId("notebook-drawer")).toBeVisible();
 
-    await page.getByTestId("notebook-drawer").getByRole("button", { name: "Poem" }).click();
+    await page.getByTestId("notebook-drawer").getByRole("button", { name: /Poem|Poema|Poème|Gedicht|Poesia/i }).click();
 
     await editor.fill("Second poem unique text");
     await expect(editor).toHaveValue("Second poem unique text");
@@ -73,7 +73,7 @@ test.describe("Rhythmic Thesaurus v2.5 — Editorial Zen", () => {
     const poemButtons = page
       .getByTestId("notebook-drawer")
       .getByRole("button")
-      .filter({ hasText: "Untitled" });
+      .filter({ hasText: /Untitled|Sin título|Sans titre|Ohne Titel|Senza titolo/i });
     await expect(poemButtons).toHaveCount(2);
 
     await poemButtons.nth(1).click();
@@ -85,7 +85,7 @@ test.describe("Rhythmic Thesaurus v2.5 — Editorial Zen", () => {
     await expect(page.getByTestId("inspector-drawer")).toBeVisible();
 
     const drawer = page.getByTestId("inspector-drawer");
-    const searchInput = drawer.getByPlaceholder("Search rhymes & synonyms...");
+    const searchInput = drawer.getByPlaceholder(/Search rhymes|Buscar rimas|Rechercher|Reime|Cerca rime/i);
     await searchInput.fill("night");
 
     await expect(
@@ -97,7 +97,7 @@ test.describe("Rhythmic Thesaurus v2.5 — Editorial Zen", () => {
       .filter({ hasText: /syl/ })
       .allTextContents();
 
-    await drawer.getByRole("button", { name: "Gothic", exact: true }).click();
+    await drawer.getByRole("button", { name: /Gothic|Gótico|Gothique|Gotisch|Gotico/i }).click();
 
     await page.waitForTimeout(500);
 
@@ -126,10 +126,68 @@ test.describe("Rhythmic Thesaurus v2.5 — Editorial Zen", () => {
     const popover = page.getByTestId("selection-popover");
     await expect(popover).toBeVisible({ timeout: 10_000 });
     await expect(popover).toContainText("friendship");
-    await expect(popover.getByText("Search more →")).toBeVisible();
+    await expect(popover.getByText(/Search more|Buscar más|Chercher plus|Mehr suchen|Cerca di più/i)).toBeVisible();
 
     await expect(
       popover.getByRole("button").first()
     ).toBeVisible({ timeout: 15_000 });
+  });
+});
+
+test.describe("RhythmCraft v3.0", () => {
+  test.beforeEach(async ({ page }) => {
+    await page.addInitScript(() => {
+      localStorage.clear();
+    });
+    await gotoApp(page);
+  });
+
+  test("6. Language switch updates UI labels", async ({ page }) => {
+    await page.getByTestId("language-selector").click();
+    await page.getByRole("option", { name: /Español/i }).click();
+    await page.keyboard.press("Control+k");
+    await expect(
+      page.getByTestId("command-palette").getByPlaceholder(/Buscar rimas/i)
+    ).toBeVisible({ timeout: 8_000 });
+  });
+
+  test("7. Emoji suggestions appear for night", async ({ page }) => {
+    await page.keyboard.press("Control+k");
+    const palette = page.getByTestId("command-palette");
+    await expect(palette).toBeVisible();
+    const input = palette.locator('input[type="text"]');
+    await input.fill("night");
+    await expect(page.getByTestId("emoji-suggestions")).toBeVisible({ timeout: 10_000 });
+    await expect(page.getByTestId("emoji-suggestions")).toContainText("🌙");
+  });
+
+  test("8. Grammar check toggle flags misspelling", async ({ page }) => {
+    const editor = page.getByTestId("poetry-editor");
+    await editor.fill("This is an test of grammer.");
+
+    await page.keyboard.press("Control+i");
+    const drawer = page.getByTestId("inspector-drawer");
+    await expect(drawer).toBeVisible();
+    await drawer.getByRole("button", { name: /Analysis|Análisis|Analyse|Analisi/i }).click();
+    await expect(drawer.getByTestId("grammar-check-toggle")).toBeVisible({ timeout: 5_000 });
+    await drawer.getByTestId("grammar-check-toggle").check();
+
+    await expect
+      .poll(async () => {
+        return page.locator("[data-grammar-match]").count();
+      }, { timeout: 25_000 })
+      .toBeGreaterThan(0);
+  });
+
+  test("9. Mobile viewport shows bottom sheet drawer", async ({ page }) => {
+    await page.setViewportSize({ width: 390, height: 844 });
+    await page.reload();
+    await expect(page.getByTestId("poetry-editor")).toBeVisible({ timeout: 15_000 });
+    await page.keyboard.press("Control+i");
+    await expect(
+      page.getByRole("dialog", { name: /Analysis|Análisis|Analyse|Analisi/i })
+    ).toBeVisible({ timeout: 8_000 });
+    await expect(page.getByTestId("mobile-bottom-sheet")).toBeVisible();
+    await expect(page.getByTestId("inspector-drawer")).toBeVisible();
   });
 });

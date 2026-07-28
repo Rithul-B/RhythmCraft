@@ -34,7 +34,7 @@ export function ThemeSwitcher({ theme, onThemeChange }: ThemeSwitcherProps) {
       <button
         type="button"
         onClick={() => setOpen(!open)}
-        className="rounded-full p-2 text-[var(--muted)] transition-all duration-300 hover:bg-[var(--surface-raised)]/60 hover:text-[var(--text)]"
+        className="flex min-h-11 min-w-11 items-center justify-center rounded-full p-2 text-[var(--muted)] transition-all duration-300 hover:bg-[var(--surface-raised)]/60 hover:text-[var(--text)] md:min-h-0 md:min-w-0"
         title="Change theme"
       >
         <span

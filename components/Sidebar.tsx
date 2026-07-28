@@ -6,6 +6,7 @@ import { RhythmRhymeFinder } from "./RhythmRhymeFinder";
 import { LineAnalysis } from "./LineAnalysis";
 import type { LineAnalysisResult } from "@/hooks/useLineAnalysis";
 import type { FootPreset } from "@/lib/stress";
+import { t as translate } from "@/lib/i18n/translations";
 
 type Tab = "search" | "analysis";
 
@@ -18,6 +19,7 @@ interface SidebarProps {
   onShowAllMeterBreaksChange: (value: boolean) => void;
 }
 
+/** Legacy sidebar kept for compatibility; WritingWorkspace uses InspectorDrawer. */
 export function Sidebar({
   analysis,
   text,
@@ -27,6 +29,7 @@ export function Sidebar({
   onShowAllMeterBreaksChange,
 }: SidebarProps) {
   const [tab, setTab] = useState<Tab>("search");
+  const t = (key: Parameters<typeof translate>[1]) => translate("en", key);
 
   return (
     <div className="flex h-full flex-col">
@@ -62,6 +65,8 @@ export function Sidebar({
           <RhythmRhymeFinder
             footPreset={footPreset}
             onFootPresetChange={onFootPresetChange}
+            language="en"
+            t={t}
           />
         ) : (
           <LineAnalysis
@@ -69,6 +74,7 @@ export function Sidebar({
             text={text}
             showAllMeterBreaks={showAllMeterBreaks}
             onShowAllMeterBreaksChange={onShowAllMeterBreaksChange}
+            t={t}
           />
         )}
       </div>

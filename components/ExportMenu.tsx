@@ -9,9 +9,10 @@ interface ExportMenuProps {
   text: string;
   title: string;
   rhymeScheme: RhymeSchemeResult;
+  exportLabel?: string;
 }
 
-export function ExportMenu({ text, title, rhymeScheme }: ExportMenuProps) {
+export function ExportMenu({ text, title, rhymeScheme, exportLabel = "Export" }: ExportMenuProps) {
   const [open, setOpen] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
 
@@ -37,10 +38,10 @@ export function ExportMenu({ text, title, rhymeScheme }: ExportMenuProps) {
       <button
         type="button"
         onClick={() => setOpen(!open)}
-        className="flex items-center gap-1.5 rounded-full px-3 py-1.5 text-xs text-[var(--muted)] hover:bg-[var(--surface-raised)]/60"
+        className="flex min-h-11 items-center gap-1.5 rounded-full px-3 py-1.5 text-xs text-[var(--muted)] hover:bg-[var(--surface-raised)]/60 md:min-h-0"
       >
         <Download className="h-3.5 w-3.5" strokeWidth={1.5} />
-        Export
+        {exportLabel}
       </button>
 
       {open && (

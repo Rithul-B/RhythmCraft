@@ -1,5 +1,8 @@
 import { useCallback, useEffect, useState } from "react";
 import type { WordResult } from "@/lib/datamuse";
+import { getEmojisForWord } from "@/lib/emojiLexicon";
+import { fetchFreeDictionarySynonyms } from "@/lib/freeDictionary";
+import { hasFullWordSearch, hasToneFilters, type AppLanguage } from "@/lib/i18n/languages";
 import {
   matchesMeter,
   parseArpabetStress,
@@ -9,7 +12,7 @@ import { scoreWordForTone, type TonePreset } from "@/lib/toneLexicon";
 
 const EMPTY_RESULTS: WordResult[] = [];
 
-export function useWordSearch(debounceMs = 300) {
+export function useWordSearch(language: AppLanguage = "en", debounceMs = 300) {
   const [query, setQuery] = useState("");
   const [debouncedQuery, setDebouncedQuery] = useState("");
   const [syllableFilters, setSyllableFilters] = useState<number[]>([]);
@@ -20,9 +23,9 @@ export function useWordSearch(debounceMs = 300) {
   const [fetchedIsMock, setIsMock] = useState(false);
   const [copiedWord, setCopiedWord] = useState<string | null>(null);
 
-  // Derived rather than cleared in an effect, so an emptied query blanks the list immediately.
   const results = debouncedQuery ? fetchedResults : EMPTY_RESULTS;
   const isMock = debouncedQuery ? fetchedIsMock : false;
+  const emojiSuggestions = debouncedQuery ? getEmojisForWord(debouncedQuery) : [];
 
   useEffect(() => {
     const timer = setTimeout(() => setDebouncedQuery(query.trim()), debounceMs);
@@ -37,11 +40,25 @@ export function useWordSearch(debounceMs = 300) {
     async function search() {
       setLoading(true);
       try {
+        if (!hasFullWordSearch(language)) {
+          const lang = language as "fr" | "de" | "it";
+          const synonyms = await fetchFreeDictionarySynonyms(
+            debouncedQuery,
+            lang,
+            controller.signal
+          );
+          setResults(synonyms);
+          setIsMock(false);
+          return;
+        }
+
+        const effectiveTone = hasToneFilters(language) ? tone : "none";
         const params = new URLSearchParams({
           q: debouncedQuery,
           type: "both",
           max: "80",
-          tone,
+          tone: effectiveTone,
+          lang: language,
         });
         const res = await fetch(`/api/words?${params}`, {
           signal: controller.signal,
@@ -69,12 +86,12 @@ export function useWordSearch(debounceMs = 300) {
 
         const ranked = filtered.map((w, index) => ({
           word: w,
-          toneScore: scoreWordForTone(w.word, tone),
+          toneScore: scoreWordForTone(w.word, effectiveTone),
           originalIndex: index,
         }));
 
         ranked.sort((a, b) => {
-          if (tone !== "none" && b.toneScore !== a.toneScore) {
+          if (effectiveTone !== "none" && b.toneScore !== a.toneScore) {
             return b.toneScore - a.toneScore;
           }
           return a.originalIndex - b.originalIndex;
@@ -95,7 +112,7 @@ export function useWordSearch(debounceMs = 300) {
 
     search();
     return () => controller.abort();
-  }, [debouncedQuery, syllableFilters, footPreset, tone]);
+  }, [debouncedQuery, syllableFilters, footPreset, tone, language]);
 
   const toggleSyllableFilter = useCallback((count: number) => {
     setSyllableFilters((prev) =>
@@ -127,5 +144,6 @@ export function useWordSearch(debounceMs = 300) {
     isMock,
     copiedWord,
     copyWord,
+    emojiSuggestions,
   };
 }

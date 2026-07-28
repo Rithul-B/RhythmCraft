@@ -5,7 +5,8 @@ export type TonePreset =
   | "gothic"
   | "uplifting"
   | "archaic"
-  | "modern";
+  | "modern"
+  | "slang";
 
 export interface ToneDefinition {
   id: Exclude<TonePreset, "none">;
@@ -82,6 +83,18 @@ export const TONE_DEFINITIONS: ToneDefinition[] = [
     ],
     demote: ["thee", "hath", "forsooth"],
   },
+  {
+    id: "slang",
+    label: "Slang / Vernacular",
+    mlHints: "slang vernacular colloquial street talk",
+    seeds: [
+      "lowkey", "highkey", "vibe", "vibes", "bet", "cap", "no cap", "rizz",
+      "goated", "slay", "flex", "ghost", "ghosted", "sus", "mid", "fire",
+      "lit", "salty", "shade", "tea", "stan", "simp", "yeet", "bruh",
+      "finna", "gonna", "wanna", "aight", "dude", "bro", "fam", "cuz",
+    ],
+    demote: ["thee", "hath", "forsooth", "wherefore", "verily"],
+  },
 ];
 
 export function getToneDefinition(tone: TonePreset): ToneDefinition | null {
@@ -111,6 +124,10 @@ export function scoreWordForTone(word: string, tone: TonePreset): number {
 
   if (tone === "modern") {
     if (/(ing|ed|ly)$/.test(lower) && lower.length < 6) score += 10;
+  }
+
+  if (tone === "slang") {
+    if (/(na|in'|izzle|af)$/.test(lower) || lower.includes("'")) score += 20;
   }
 
   return Math.max(0, Math.min(100, score));

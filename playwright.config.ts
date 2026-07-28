@@ -2,6 +2,7 @@ import { defineConfig, devices } from "@playwright/test";
 
 // Point the suite at a deployed URL to smoke-test it; otherwise run against a local dev server.
 const remoteBaseURL = process.env.PLAYWRIGHT_BASE_URL;
+const localURL = "http://localhost:3005";
 
 export default defineConfig({
   testDir: "./e2e",
@@ -12,7 +13,7 @@ export default defineConfig({
   reporter: [["list"], ["html", { open: "never" }]],
   timeout: 60_000,
   use: {
-    baseURL: remoteBaseURL ?? "http://localhost:3000",
+    baseURL: remoteBaseURL ?? localURL,
     trace: "on-first-retry",
     headless: true,
   },
@@ -26,9 +27,9 @@ export default defineConfig({
     ? {}
     : {
         webServer: {
-          command: "npm run dev",
-          url: "http://localhost:3000",
-          reuseExistingServer: true,
+          command: "npx next dev --port 3005",
+          url: localURL,
+          reuseExistingServer: !process.env.CI,
           timeout: 120_000,
         },
       }),

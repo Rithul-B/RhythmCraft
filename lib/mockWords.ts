@@ -22,6 +22,23 @@ const TONE_MOCK_WORDS: Record<string, DatamuseWord[]> = {
     { word: "soar", numSyllables: 1, tags: ["pron:S AO1 R"] },
     { word: "bloom", numSyllables: 1, tags: ["pron:B L UW1 M"] },
   ],
+  archaic: [
+    { word: "thou", numSyllables: 1, tags: [] },
+    { word: "hath", numSyllables: 1, tags: [] },
+    { word: "wherefore", numSyllables: 3, tags: [] },
+  ],
+  modern: [
+    { word: "neon", numSyllables: 2, tags: [] },
+    { word: "glitch", numSyllables: 1, tags: [] },
+    { word: "asphalt", numSyllables: 2, tags: [] },
+  ],
+  slang: [
+    { word: "vibe", numSyllables: 1, tags: [] },
+    { word: "lowkey", numSyllables: 2, tags: [] },
+    { word: "rizz", numSyllables: 1, tags: [] },
+    { word: "goated", numSyllables: 2, tags: [] },
+    { word: "slay", numSyllables: 1, tags: [] },
+  ],
 };
 
 const MOCK_RHYMES: Record<string, DatamuseWord[]> = {

@@ -7,9 +7,13 @@ A meter-aware writing app for poets and lyricists. Write in a distraction-free c
 - **Editorial Zen canvas** — centered serif editor with everything else tucked away until you need it
 - **Live meter diagnostics** — detects the prevailing metrical foot and softly underlines lines that break it
 - **Rhyme scheme mapping** — computes ABAB, AABB, and other patterns as you write
-- **Rhyme & synonym search** — powered by the [Datamuse API](https://datamuse.com), filterable by syllable count and metrical foot
-- **Tone & Vibe filters** — rank suggestions by mood: melancholic, ethereal, gothic, uplifting, archaic, or modern
-- **Cadence reader** — reads your poem aloud with an adjustable BPM tempo slider
+- **Rhyme & synonym search** — English/Spanish via [Datamuse](https://datamuse.com); French/German/Italian synonyms via Free Dictionary API
+- **Emoji suggestions** — poetic keyword search also returns relevant emoji
+- **Tone & Vibe filters** — melancholic, ethereal, gothic, uplifting, archaic, modern/gritty, and slang/vernacular (English)
+- **Spelling & grammar** — opt-in LanguageTool linting with wavy underlines and quick-fix tooltips (off by default)
+- **Multi-language UI** — English, Spanish, French, German, Italian interface labels
+- **Cadence reader** — voice picker, pitch + BPM controls, and poetic pacing with caesura pauses
+- **Mobile-ready drawers** — bottom sheets with drag-to-dismiss on phones; 44px tap targets
 - **Notebooks** — organise poems into collections, saved locally in your browser
 - **Themes** — Cream Parchment and Obsidian Dark
 - **Export** — download as `.txt` or `.pdf` with optional line numbers and rhyme labels
@@ -47,13 +51,17 @@ Open [http://localhost:3000](http://localhost:3000).
 
 ## Deployment
 
-RhythmCraft is a standard Next.js App Router project and deploys to [Vercel](https://vercel.com) without configuration. Push the repository to GitHub, import it in Vercel, and deploy — the `/api/words` route runs as a serverless function.
+RhythmCraft is a standard Next.js App Router project and deploys to [Vercel](https://vercel.com) without configuration. The `/api/words` and `/api/grammar` routes run as serverless functions.
 
-No environment variables or API keys are required. If Datamuse is unreachable or times out, the API route falls back to a bundled offline word list so the app keeps working.
+No environment variables or API keys are required. If Datamuse is unreachable or times out, the words API falls back to a bundled offline word list.
 
-## Data storage
+## Data storage & privacy
 
-Poems and notebooks are stored in the browser's `localStorage`, so your writing never leaves your device.
+Poems and notebooks are stored in the browser's `localStorage`.
+
+**Spelling & grammar checking is opt-in and off by default.** When you enable it in the Inspector → Analysis panel, poem text is sent to [LanguageTool](https://languagetool.org)'s public API for proofreading. Disable the toggle to stop sending text.
+
+Word/rhyme search always contacts Datamuse (or Free Dictionary for FR/DE/IT) with the search query only — not your full poem.
 
 ## Tech stack
 
@@ -61,4 +69,4 @@ Next.js 16 (App Router), React 19, TypeScript, Tailwind CSS v4, Lucide icons, js
 
 ## Credits
 
-Word data provided by the [Datamuse API](https://datamuse.com).
+Word data provided by the [Datamuse API](https://datamuse.com) and [Free Dictionary API](https://dictionaryapi.dev). Grammar checking by [LanguageTool](https://languagetool.org).

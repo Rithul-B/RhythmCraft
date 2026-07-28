@@ -9,6 +9,8 @@ interface WordGridProps {
   query: string;
   copiedWord: string | null;
   onCopy: (word: string) => void;
+  emptyLabel?: string;
+  noMatchLabel?: string;
 }
 
 export function WordGrid({
@@ -17,12 +19,12 @@ export function WordGrid({
   query,
   copiedWord,
   onCopy,
+  emptyLabel = "Enter a word to find rhymes and synonyms.",
+  noMatchLabel = "No words match your filters.",
 }: WordGridProps) {
   if (!query.trim()) {
     return (
-      <p className="py-8 text-center text-sm text-[var(--muted)]">
-        Enter a word to find rhymes and synonyms.
-      </p>
+      <p className="py-8 text-center text-sm text-[var(--muted)]">{emptyLabel}</p>
     );
   }
 
@@ -36,9 +38,7 @@ export function WordGrid({
 
   if (words.length === 0) {
     return (
-      <p className="py-8 text-center text-sm text-[var(--muted)]">
-        No words match your filters.
-      </p>
+      <p className="py-8 text-center text-sm text-[var(--muted)]">{noMatchLabel}</p>
     );
   }
 
@@ -51,7 +51,7 @@ export function WordGrid({
             key={item.word}
             type="button"
             onClick={() => onCopy(item.word)}
-            className="zen-pill group flex items-center justify-between gap-2 rounded-2xl bg-[var(--surface-raised)]/60 px-3.5 py-2.5 text-left shadow-sm transition-all duration-300 ease-in-out hover:-translate-y-0.5 hover:bg-[var(--surface-raised)] hover:shadow-md"
+            className="zen-pill group flex min-h-11 items-center justify-between gap-2 rounded-2xl bg-[var(--surface-raised)]/60 px-3.5 py-2.5 text-left shadow-sm transition-all duration-300 ease-in-out hover:-translate-y-0.5 hover:bg-[var(--surface-raised)] hover:shadow-md md:min-h-0"
           >
             <span className="truncate text-sm text-[var(--text)]">{item.word}</span>
             <span className="flex shrink-0 items-center gap-1.5">

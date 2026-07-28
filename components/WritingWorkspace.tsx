@@ -8,25 +8,31 @@ import { NotebookPanel } from "@/components/NotebookPanel";
 import { InspectorDrawer } from "@/components/InspectorDrawer";
 import { CommandPalette } from "@/components/CommandPalette";
 import { SelectionPopover } from "@/components/SelectionPopover";
+import { GrammarTooltip } from "@/components/GrammarTooltip";
 import { BottomToolbar } from "@/components/BottomToolbar";
 import { useLineAnalysis } from "@/hooks/useLineAnalysis";
 import { useWorkspaceStore } from "@/hooks/useWorkspaceStore";
 import { useWorkspaceUI } from "@/hooks/useWorkspaceUI";
 import { useTheme } from "@/hooks/useTheme";
+import { useLanguage } from "@/hooks/useLanguage";
+import { useGrammarCheck } from "@/hooks/useGrammarCheck";
 import { useKeyboardShortcuts } from "@/hooks/useKeyboardShortcuts";
 import { getSelectedWord, getSelectionAnchor } from "@/lib/selection";
 import type { FootPreset } from "@/lib/stress";
+import type { GrammarMatch } from "@/lib/grammarCheck";
 
 export function WritingWorkspace() {
   const [footPreset, setFootPreset] = useState<FootPreset>("any");
   const [showAllMeterBreaks, setShowAllMeterBreaks] = useState(false);
   const [toolbarVisible, setToolbarVisible] = useState(true);
-  // Held in state, not a ref: the popover anchor is derived during render and must
-  // recompute once the textarea actually mounts.
+  const [grammarCheckEnabled, setGrammarCheckEnabled] = useState(false);
+  const [activeGrammarMatch, setActiveGrammarMatch] = useState<GrammarMatch | null>(null);
+  const [grammarAnchor, setGrammarAnchor] = useState<{ top: number; left: number } | null>(null);
   const [textareaEl, setTextareaEl] = useState<HTMLTextAreaElement | null>(null);
   const typingTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const { theme, setTheme } = useTheme();
+  const { language, setLanguage, t } = useLanguage();
   const ui = useWorkspaceUI();
   const {
     hydrated,
@@ -42,10 +48,15 @@ export function WritingWorkspace() {
   } = useWorkspaceStore();
 
   const text = activePoem?.text ?? "";
-  const poemTitle = activePoem?.title ?? "Untitled";
+  const poemTitle = activePoem?.title ?? t("untitled");
   const selectionStart = ui.selectionRange.start;
 
   const analysis = useLineAnalysis(text, selectionStart, footPreset);
+  const { matches: grammarMatches } = useGrammarCheck(
+    text,
+    language,
+    grammarCheckEnabled
+  );
 
   const selectedWord = useMemo(
     () =>
@@ -73,12 +84,28 @@ export function WritingWorkspace() {
     setToolbarVisible(true);
   }, [ui]);
 
+  const handleGrammarReplace = useCallback(
+    (replacement: string) => {
+      if (!activeGrammarMatch) return;
+      const { offset, length } = activeGrammarMatch;
+      const next = text.slice(0, offset) + replacement + text.slice(offset + length);
+      updatePoemText(next);
+      setActiveGrammarMatch(null);
+      setGrammarAnchor(null);
+    },
+    [activeGrammarMatch, text, updatePoemText]
+  );
+
   useKeyboardShortcuts(
     {
       onCommandPalette: () => ui.openCommandPalette(),
       onToggleNotebook: ui.toggleNotebook,
       onToggleInspector: ui.toggleInspector,
-      onEscape: ui.closeAllOverlays,
+      onEscape: () => {
+        setActiveGrammarMatch(null);
+        setGrammarAnchor(null);
+        ui.closeAllOverlays();
+      },
     },
     hydrated
   );
@@ -86,13 +113,20 @@ export function WritingWorkspace() {
   if (!hydrated) {
     return (
       <div className="flex h-screen items-center justify-center bg-[var(--bg)] text-[var(--muted)]">
-        Loading...
+        {t("loading")}
       </div>
     );
   }
 
   return (
-    <div className="relative flex h-screen flex-col overflow-hidden">
+    <div
+      className="relative flex h-screen flex-col overflow-hidden"
+      style={{
+        ["--editor-font-size" as string]: "clamp(1.05rem, 2.5vw, 1.25rem)",
+        ["--editor-padding-y" as string]: "clamp(1.5rem, 4vw, 3rem)",
+        ["--editor-padding-x" as string]: "clamp(1rem, 3vw, 2rem)",
+      }}
+    >
       <EditorHeader
         poemTitle={poemTitle}
         onTitleChange={updatePoemTitle}
@@ -103,9 +137,12 @@ export function WritingWorkspace() {
         onThemeChange={setTheme}
         text={text}
         rhymeScheme={analysis.rhymeScheme}
+        language={language}
+        onLanguageChange={setLanguage}
+        t={t}
       />
 
-      <main className="flex min-h-0 flex-1 justify-center overflow-y-auto px-4 py-6 md:px-8 md:py-10">
+      <main className="flex min-h-0 flex-1 justify-center overflow-y-auto px-3 py-4 md:px-8 md:py-10">
         <PoetryEditor
           text={text}
           onTextChange={updatePoemText}
@@ -114,6 +151,12 @@ export function WritingWorkspace() {
           analysis={analysis}
           onTyping={handleTyping}
           onBlur={handleBlur}
+          placeholder={t("beginWriting")}
+          grammarMatches={grammarMatches}
+          onGrammarMatchSelect={(match, rect) => {
+            setActiveGrammarMatch(match);
+            setGrammarAnchor({ top: rect.bottom, left: rect.left });
+          }}
         />
       </main>
 
@@ -121,7 +164,7 @@ export function WritingWorkspace() {
         side="left"
         open={ui.notebookOpen}
         onClose={() => ui.setNotebookOpen(false)}
-        label="Notebooks"
+        label={t("notebooks")}
       >
         <NotebookPanel
           notebooks={notebooks}
@@ -135,6 +178,7 @@ export function WritingWorkspace() {
           onCreatePoem={createPoem}
           onDeletePoem={deletePoem}
           onClose={() => ui.setNotebookOpen(false)}
+          t={t}
         />
       </SlideDrawer>
 
@@ -143,7 +187,7 @@ export function WritingWorkspace() {
         open={ui.inspectorOpen}
         onClose={() => ui.setInspectorOpen(false)}
         width="360px"
-        label="Inspector"
+        label={t("analysis")}
       >
         <InspectorDrawer
           analysis={analysis}
@@ -153,6 +197,10 @@ export function WritingWorkspace() {
           showAllMeterBreaks={showAllMeterBreaks}
           onShowAllMeterBreaksChange={setShowAllMeterBreaks}
           onClose={() => ui.setInspectorOpen(false)}
+          language={language}
+          t={t}
+          grammarCheckEnabled={grammarCheckEnabled}
+          onGrammarCheckEnabledChange={setGrammarCheckEnabled}
         />
       </SlideDrawer>
 
@@ -162,6 +210,8 @@ export function WritingWorkspace() {
         footPreset={footPreset}
         onFootPresetChange={setFootPreset}
         onClose={ui.closeCommandPalette}
+        language={language}
+        t={t}
       />
 
       <SelectionPopover
@@ -171,12 +221,29 @@ export function WritingWorkspace() {
         onClose={() =>
           ui.setSelectionRange({ start: selectionStart, end: selectionStart })
         }
+        labels={{
+          searchMore: t("searchMore"),
+          noQuickMatches: t("noQuickMatches"),
+          findingRhymes: t("findingRhymes"),
+        }}
+      />
+
+      <GrammarTooltip
+        match={activeGrammarMatch}
+        anchor={grammarAnchor}
+        replaceLabel={t("grammarReplace")}
+        onReplace={handleGrammarReplace}
+        onClose={() => {
+          setActiveGrammarMatch(null);
+          setGrammarAnchor(null);
+        }}
       />
 
       <BottomToolbar
-        visible={toolbarVisible && !ui.anyOverlayOpen && !selectedWord}
+        visible={toolbarVisible && !ui.anyOverlayOpen && !selectedWord && !activeGrammarMatch}
         onOpenCommand={() => ui.openCommandPalette()}
         onOpenInspector={ui.toggleInspector}
+        searchLabel={t("search")}
       />
     </div>
   );

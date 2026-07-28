@@ -6,12 +6,14 @@ interface BottomToolbarProps {
   visible: boolean;
   onOpenCommand: () => void;
   onOpenInspector: () => void;
+  searchLabel?: string;
 }
 
 export function BottomToolbar({
   visible,
   onOpenCommand,
   onOpenInspector,
+  searchLabel = "Search",
 }: BottomToolbarProps) {
   return (
     <div
@@ -23,10 +25,10 @@ export function BottomToolbar({
       <button
         type="button"
         onClick={onOpenCommand}
-        className="zen-pill flex items-center gap-2 rounded-full px-3 py-1.5 text-xs text-[var(--muted)] hover:text-[var(--text)]"
+        className="zen-pill flex min-h-11 items-center gap-2 rounded-full px-3 py-1.5 text-xs text-[var(--muted)] hover:text-[var(--text)] md:min-h-0"
       >
         <Search className="h-3.5 w-3.5" strokeWidth={1.5} />
-        <span className="hidden sm:inline">Search</span>
+        <span className="hidden sm:inline">{searchLabel}</span>
         <kbd className="rounded bg-[var(--surface)] px-1.5 py-0.5 font-mono text-[10px] text-[var(--muted-light)]">
           ⌘K
         </kbd>
@@ -35,7 +37,7 @@ export function BottomToolbar({
       <button
         type="button"
         onClick={onOpenInspector}
-        className="zen-pill flex items-center gap-2 rounded-full px-3 py-1.5 text-xs text-[var(--muted)] hover:text-[var(--text)]"
+        className="zen-pill flex min-h-11 items-center gap-2 rounded-full px-3 py-1.5 text-xs text-[var(--muted)] hover:text-[var(--text)] md:min-h-0"
         title="Inspector (⌘I)"
       >
         <PanelRight className="h-3.5 w-3.5" strokeWidth={1.5} />

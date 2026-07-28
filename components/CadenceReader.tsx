@@ -8,13 +8,39 @@ import {
   getPacingLabel,
   getStanzaCadences,
 } from "@/lib/cadence";
+import { VoiceReaderControls } from "./VoiceReaderControls";
 
 interface CadenceReaderProps {
   text: string;
+  labels?: {
+    title?: string;
+    readAloud?: string;
+    stop?: string;
+    tempo?: string;
+    voice?: string;
+    pitch?: string;
+    poeticPacing?: string;
+    unavailable?: string;
+    stanza?: string;
+  };
 }
 
-export function CadenceReader({ text }: CadenceReaderProps) {
-  const { bpm, setBpm, isPlaying, isSupported, speak, stop } = useCadenceReader();
+export function CadenceReader({ text, labels = {} }: CadenceReaderProps) {
+  const {
+    bpm,
+    setBpm,
+    pitch,
+    setPitch,
+    poeticPacing,
+    setPoeticPacing,
+    voices,
+    selectedVoiceURI,
+    setSelectedVoiceURI,
+    isPlaying,
+    isSupported,
+    speak,
+    stop,
+  } = useCadenceReader();
 
   const readingTime = formatReadingTime(estimateReadingTimeMs(text, bpm));
   const pacingLabel = getPacingLabel(bpm);
@@ -23,7 +49,7 @@ export function CadenceReader({ text }: CadenceReaderProps) {
   if (!isSupported) {
     return (
       <p className="text-xs text-[var(--muted)]">
-        Speech synthesis is not available in this browser.
+        {labels.unavailable ?? "Speech synthesis is not available in this browser."}
       </p>
     );
   }
@@ -31,7 +57,7 @@ export function CadenceReader({ text }: CadenceReaderProps) {
   return (
     <div>
       <p className="mb-2 text-[10px] tracking-[0.2em] text-[var(--muted-light)] uppercase">
-        Cadence reader
+        {labels.title ?? "Cadence reader"}
       </p>
       <div className="rounded-2xl bg-[var(--surface-raised)]/60 p-4 shadow-sm">
         <div className="mb-4 flex items-center gap-2">
@@ -39,17 +65,17 @@ export function CadenceReader({ text }: CadenceReaderProps) {
             type="button"
             onClick={() => (isPlaying ? stop() : speak(text))}
             disabled={!text.trim()}
-            className="flex items-center gap-2 rounded-full bg-[var(--text)] px-4 py-2 text-xs text-[var(--bg)] transition-opacity hover:opacity-90 disabled:opacity-40"
+            className="flex min-h-11 items-center gap-2 rounded-full bg-[var(--text)] px-4 py-2 text-xs text-[var(--bg)] transition-opacity hover:opacity-90 disabled:opacity-40 md:min-h-0"
           >
             {isPlaying ? (
               <>
                 <Square className="h-3 w-3" fill="currentColor" />
-                Stop
+                {labels.stop ?? "Stop"}
               </>
             ) : (
               <>
                 <Play className="h-3 w-3" />
-                Read aloud
+                {labels.readAloud ?? "Read aloud"}
               </>
             )}
           </button>
@@ -60,7 +86,7 @@ export function CadenceReader({ text }: CadenceReaderProps) {
 
         <label className="block">
           <span className="mb-1 block text-[10px] text-[var(--muted-light)] uppercase">
-            Tempo — {bpm} BPM
+            {labels.tempo ?? "Tempo"} — {bpm} BPM
           </span>
           <input
             type="range"
@@ -72,11 +98,26 @@ export function CadenceReader({ text }: CadenceReaderProps) {
           />
         </label>
 
+        <VoiceReaderControls
+          voices={voices}
+          selectedVoiceURI={selectedVoiceURI}
+          onVoiceChange={setSelectedVoiceURI}
+          pitch={pitch}
+          onPitchChange={setPitch}
+          poeticPacing={poeticPacing}
+          onPoeticPacingChange={setPoeticPacing}
+          labels={{
+            voice: labels.voice ?? "Voice",
+            pitch: labels.pitch ?? "Pitch",
+            poeticPacing: labels.poeticPacing ?? "Poetic pacing",
+          }}
+        />
+
         {stanzas.length > 1 && (
           <div className="mt-3 space-y-1">
             {stanzas.map((s) => (
               <p key={s.index} className="text-[10px] text-[var(--muted)]">
-                Stanza {s.index}: {s.lineCount} lines · {formatReadingTime(s.readingTimeMs)}
+                {labels.stanza ?? "Stanza"} {s.index}: {s.lineCount} · {formatReadingTime(s.readingTimeMs)}
               </p>
             ))}
           </div>

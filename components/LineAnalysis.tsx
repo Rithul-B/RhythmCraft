@@ -4,12 +4,14 @@ import { BarChart3 } from "lucide-react";
 import { CadenceReader } from "./CadenceReader";
 import type { LineAnalysisResult } from "@/hooks/useLineAnalysis";
 import { FOOT_PATTERNS } from "@/lib/stress";
+import type { TranslationKey } from "@/lib/i18n/translations";
 
 interface LineAnalysisProps {
   analysis: LineAnalysisResult;
   text: string;
   showAllMeterBreaks: boolean;
   onShowAllMeterBreaksChange: (value: boolean) => void;
+  t: (key: TranslationKey) => string;
 }
 
 export function LineAnalysis({
@@ -17,6 +19,7 @@ export function LineAnalysis({
   text,
   showAllMeterBreaks,
   onShowAllMeterBreaksChange,
+  t,
 }: LineAnalysisProps) {
   const {
     activeStats,
@@ -41,7 +44,7 @@ export function LineAnalysis({
       {rhymeScheme.scheme && (
         <div>
           <p className="mb-2 text-[10px] tracking-[0.2em] text-[var(--muted-light)] uppercase">
-            Rhyme scheme
+            {t("rhymeScheme")}
           </p>
           <p className="mb-3 font-mono text-2xl tracking-[0.3em] text-[var(--accent)]">
             {rhymeScheme.scheme}
@@ -66,13 +69,13 @@ export function LineAnalysis({
 
       <div>
         <p className="mb-2 text-[10px] tracking-[0.2em] text-[var(--muted-light)] uppercase">
-          Meter summary
+          {t("meterSummary")}
         </p>
         <div className="rounded-2xl bg-[var(--surface-raised)]/60 p-4 shadow-sm">
           <p className="text-sm text-[var(--text)]">
-            Prevailing:{" "}
+            {t("prevailingMeter")}:{" "}
             <span className="capitalize text-[var(--accent)]">
-              {prevailingMeter === "any" ? "Undetected" : prevailingMeter}
+              {prevailingMeter === "any" ? "—" : prevailingMeter}
             </span>
             {prevailingMeter !== "any" && (
               <span className="ml-2 font-mono text-xs text-[var(--muted)]">
@@ -81,22 +84,35 @@ export function LineAnalysis({
             )}
           </p>
           <p className="mt-2 text-xs text-[var(--muted)]">
-            {softBreaks} soft break{softBreaks !== 1 ? "s" : ""}
-            {hardBreaks > 0 && ` · ${hardBreaks} hard break${hardBreaks !== 1 ? "s" : ""}`}
+            {softBreaks} {t("softBreaks")}
+            {hardBreaks > 0 && ` · ${hardBreaks} ${t("hardBreaks")}`}
           </p>
-          <label className="mt-3 flex cursor-pointer items-center gap-2 text-xs text-[var(--muted)]">
+          <label className="mt-3 flex min-h-11 cursor-pointer items-center gap-2 text-xs text-[var(--muted)] md:min-h-0">
             <input
               type="checkbox"
               checked={showAllMeterBreaks}
               onChange={(e) => onShowAllMeterBreaksChange(e.target.checked)}
               className="rounded accent-[var(--accent)]"
             />
-            Show all meter breaks
+            {t("showAllMeterBreaks")}
           </label>
         </div>
       </div>
 
-      <CadenceReader text={text} />
+      <CadenceReader
+        text={text}
+        labels={{
+          title: t("cadenceReader"),
+          readAloud: t("readAloud"),
+          stop: t("stop"),
+          tempo: t("tempo"),
+          voice: t("voice"),
+          pitch: t("pitch"),
+          poeticPacing: t("poeticPacing"),
+          unavailable: t("speechUnavailable"),
+          stanza: t("stanza"),
+        }}
+      />
 
       {!activeStats || !activeStats.text.trim() ? (
         <div className="flex flex-col items-center justify-center py-8 text-center">
@@ -118,7 +134,7 @@ export function LineAnalysis({
 
           <div>
             <p className="mb-1 text-[10px] tracking-[0.2em] text-[var(--muted-light)] uppercase">
-              Syllables
+              {t("syllables")}
             </p>
             <p className="text-4xl font-light tabular-nums text-[var(--text)]">
               {activeStats.syllables}
@@ -169,10 +185,12 @@ export function LineAnalysis({
 
       <div className="pt-2">
         <p className="mb-2 text-[10px] tracking-[0.2em] text-[var(--muted-light)] uppercase">
-          Stanza summary
+          {t("stanza")}
         </p>
         <div className="flex gap-6 text-sm text-[var(--muted)]">
-          <span>{stanzaLineCount} lines</span>
+          <span>
+            {stanzaLineCount} {stanzaLineCount === 1 ? t("line") : t("lines")}
+          </span>
           <span>{avgSyllablesPerLine.toFixed(1)} avg syl/line</span>
         </div>
       </div>

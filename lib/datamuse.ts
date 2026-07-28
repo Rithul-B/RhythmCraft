@@ -13,19 +13,25 @@ export interface WordResult {
   toneScore?: number;
 }
 
-export function buildDatamuseUrls(query: string, max = 80, toneMl?: string | null): string[] {
+export function buildDatamuseUrls(
+  query: string,
+  max = 80,
+  toneMl?: string | null,
+  lang: "en" | "es" = "en"
+): string[] {
   const encoded = encodeURIComponent(query.trim());
   const base = "https://api.datamuse.com/words";
   const metadata = "md=s&md=r";
+  const vocab = lang === "es" ? "&v=es" : "";
 
   const urls = [
-    `${base}?rel_rhy=${encoded}&${metadata}&max=${max}`,
-    `${base}?ml=${encoded}&${metadata}&max=${max}`,
+    `${base}?rel_rhy=${encoded}&${metadata}&max=${max}${vocab}`,
+    `${base}?ml=${encoded}&${metadata}&max=${max}${vocab}`,
   ];
 
-  if (toneMl) {
+  if (toneMl && lang === "en") {
     urls.push(
-      `${base}?ml=${encodeURIComponent(toneMl)}&${metadata}&max=${max}`
+      `${base}?ml=${encodeURIComponent(toneMl)}&${metadata}&max=${max}${vocab}`
     );
   }
 

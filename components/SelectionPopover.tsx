@@ -11,6 +11,11 @@ interface SelectionPopoverProps {
   anchor: { top: number; left: number } | null;
   onSearchMore: (word: string) => void;
   onClose: () => void;
+  labels?: {
+    searchMore?: string;
+    noQuickMatches?: string;
+    findingRhymes?: string;
+  };
 }
 
 export function SelectionPopover({
@@ -18,6 +23,7 @@ export function SelectionPopover({
   anchor,
   onSearchMore,
   onClose,
+  labels = {},
 }: SelectionPopoverProps) {
   // Results are stored with the word they belong to, so both the stale-result flash and a
   // superseded request clearing the spinner are impossible by construction.
@@ -72,7 +78,9 @@ export function SelectionPopover({
         </div>
 
         {loading ? (
-          <div className="py-3 text-center text-xs text-[var(--muted)]">Finding rhymes...</div>
+          <div className="py-3 text-center text-xs text-[var(--muted)]">
+            {labels.findingRhymes ?? "Finding rhymes..."}
+          </div>
         ) : results.length > 0 ? (
           <div className="flex flex-wrap gap-1.5">
             {results.map((r) => (
@@ -80,14 +88,16 @@ export function SelectionPopover({
                 key={r.word}
                 type="button"
                 onClick={() => navigator.clipboard.writeText(r.word)}
-                className="zen-pill rounded-full bg-[var(--surface-raised)]/70 px-2.5 py-1 text-xs text-[var(--text)] hover:shadow-md"
+                className="zen-pill min-h-11 rounded-full bg-[var(--surface-raised)]/70 px-2.5 py-1 text-xs text-[var(--text)] hover:shadow-md md:min-h-0"
               >
                 {r.word}
               </button>
             ))}
           </div>
         ) : (
-          <p className="text-xs text-[var(--muted)]">No quick matches</p>
+          <p className="text-xs text-[var(--muted)]">
+            {labels.noQuickMatches ?? "No quick matches"}
+          </p>
         )}
 
         <button
@@ -95,7 +105,7 @@ export function SelectionPopover({
           onClick={() => onSearchMore(word)}
           className="mt-2 w-full text-left text-[10px] text-[var(--accent)] hover:underline"
         >
-          Search more →
+          {labels.searchMore ?? "Search more →"}
         </button>
       </div>
     </>
