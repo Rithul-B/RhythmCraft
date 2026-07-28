@@ -1,9 +1,10 @@
 "use client";
 
-import type { SpeechVoiceOption } from "@/hooks/useCadenceReader";
+import type { SpeechVoiceOption, VoiceGroup } from "@/hooks/useCadenceReader";
+import { displayVoiceLabel } from "@/lib/speechVoices";
 
 interface VoiceReaderControlsProps {
-  voices: SpeechVoiceOption[];
+  voiceGroups: VoiceGroup[];
   selectedVoiceURI: string;
   onVoiceChange: (voiceURI: string) => void;
   pitch: number;
@@ -15,11 +16,14 @@ interface VoiceReaderControlsProps {
     pitch: string;
     poeticPacing: string;
     defaultVoice?: string;
+    voicesForLanguage?: string;
+    otherVoices?: string;
+    noVoicesHint?: string;
   };
 }
 
 export function VoiceReaderControls({
-  voices,
+  voiceGroups,
   selectedVoiceURI,
   onVoiceChange,
   pitch,
@@ -28,6 +32,8 @@ export function VoiceReaderControls({
   onPoeticPacingChange,
   labels,
 }: VoiceReaderControlsProps) {
+  const flatCount = voiceGroups.reduce((n, g) => n + g.voices.length, 0);
+
   return (
     <div className="mt-4 space-y-3">
       <label className="block">
@@ -38,17 +44,32 @@ export function VoiceReaderControls({
           value={selectedVoiceURI}
           onChange={(e) => onVoiceChange(e.target.value)}
           className="min-h-11 w-full rounded-xl border border-[var(--glass-border)] bg-[var(--surface)] px-3 py-2 text-base text-[var(--text)] lg:text-xs"
+          data-testid="voice-select"
         >
-          {voices.length === 0 ? (
+          {flatCount === 0 ? (
             <option value="">{labels.defaultVoice ?? "Default"}</option>
           ) : (
-            voices.map((v) => (
-              <option key={v.voiceURI} value={v.voiceURI}>
-                {v.name} ({v.lang})
-              </option>
-            ))
+            voiceGroups.map((group) => {
+              if (group.voices.length === 0) return null;
+              const groupLabel =
+                group.labelKey === "voicesForLanguage"
+                  ? labels.voicesForLanguage ?? "Voices for this language"
+                  : labels.otherVoices ?? "Other voices";
+              return (
+                <optgroup key={group.id} label={groupLabel}>
+                  {group.voices.map((v: SpeechVoiceOption) => (
+                    <option key={v.voiceURI} value={v.voiceURI}>
+                      {displayVoiceLabel(v)}
+                    </option>
+                  ))}
+                </optgroup>
+              );
+            })
           )}
         </select>
+        {flatCount === 0 && labels.noVoicesHint && (
+          <p className="mt-1 text-[10px] text-[var(--muted)]">{labels.noVoicesHint}</p>
+        )}
       </label>
 
       <label className="block">

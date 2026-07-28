@@ -129,6 +129,7 @@ export function InspectorDrawer({
               text={text}
               showAllMeterBreaks={showAllMeterBreaks}
               onShowAllMeterBreaksChange={onShowAllMeterBreaksChange}
+              language={language}
               t={t}
             />
           </div>

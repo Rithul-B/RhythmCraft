@@ -84,6 +84,9 @@ export type TranslationKey =
   | "copy"
   | "copied"
   | "defaultVoice"
+  | "voicesForLanguage"
+  | "otherVoices"
+  | "noVoicesHint"
   | "sylSuffix";
 
 type Dictionary = Record<TranslationKey, string>;
@@ -172,6 +175,9 @@ const en: Dictionary = {
   copy: "Copy",
   copied: "Copied",
   defaultVoice: "Default",
+  voicesForLanguage: "Voices for this language",
+  otherVoices: "Other system voices",
+  noVoicesHint: "No matching voices installed. Safari/Chrome use voices from your device settings.",
   sylSuffix: "syl",
 };
 
@@ -260,6 +266,9 @@ const es: Dictionary = {
   copy: "Copiar",
   copied: "Copiado",
   defaultVoice: "Predeterminada",
+  voicesForLanguage: "Voces para este idioma",
+  otherVoices: "Otras voces del sistema",
+  noVoicesHint: "No hay voces instaladas para este idioma. Añádelas en ajustes del dispositivo.",
   sylSuffix: "síl",
 };
 
@@ -348,6 +357,9 @@ const fr: Dictionary = {
   copy: "Copier",
   copied: "Copié",
   defaultVoice: "Par défaut",
+  voicesForLanguage: "Voix pour cette langue",
+  otherVoices: "Autres voix système",
+  noVoicesHint: "Aucune voix installée pour cette langue. Ajoutez-en dans les réglages de l'appareil.",
   sylSuffix: "syl",
 };
 
@@ -436,6 +448,9 @@ const de: Dictionary = {
   copy: "Kopieren",
   copied: "Kopiert",
   defaultVoice: "Standard",
+  voicesForLanguage: "Stimmen für diese Sprache",
+  otherVoices: "Andere Systemstimmen",
+  noVoicesHint: "Keine passenden Stimmen installiert. Füge welche in den Geräteeinstellungen hinzu.",
   sylSuffix: "Sil",
 };
 
@@ -524,6 +539,9 @@ const it: Dictionary = {
   copy: "Copia",
   copied: "Copiato",
   defaultVoice: "Predefinita",
+  voicesForLanguage: "Voci per questa lingua",
+  otherVoices: "Altre voci di sistema",
+  noVoicesHint: "Nessuna voce installata per questa lingua. Aggiungile nelle impostazioni del dispositivo.",
   sylSuffix: "sil",
 };
 

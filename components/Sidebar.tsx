@@ -74,6 +74,7 @@ export function Sidebar({
             text={text}
             showAllMeterBreaks={showAllMeterBreaks}
             onShowAllMeterBreaksChange={onShowAllMeterBreaksChange}
+            language="en"
             t={t}
           />
         )}

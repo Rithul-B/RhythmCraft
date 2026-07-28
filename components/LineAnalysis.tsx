@@ -4,6 +4,7 @@ import { BarChart3 } from "lucide-react";
 import { CadenceReader } from "./CadenceReader";
 import type { LineAnalysisResult } from "@/hooks/useLineAnalysis";
 import { FOOT_PATTERNS } from "@/lib/stress";
+import type { AppLanguage } from "@/lib/i18n/languages";
 import type { TranslationKey } from "@/lib/i18n/translations";
 
 interface LineAnalysisProps {
@@ -11,6 +12,7 @@ interface LineAnalysisProps {
   text: string;
   showAllMeterBreaks: boolean;
   onShowAllMeterBreaksChange: (value: boolean) => void;
+  language: AppLanguage;
   t: (key: TranslationKey) => string;
 }
 
@@ -19,6 +21,7 @@ export function LineAnalysis({
   text,
   showAllMeterBreaks,
   onShowAllMeterBreaksChange,
+  language,
   t,
 }: LineAnalysisProps) {
   const {
@@ -101,6 +104,7 @@ export function LineAnalysis({
 
       <CadenceReader
         text={text}
+        language={language}
         labels={{
           title: t("cadenceReader"),
           readAloud: t("readAloud"),
@@ -112,6 +116,9 @@ export function LineAnalysis({
           unavailable: t("speechUnavailable"),
           stanza: t("stanza"),
           defaultVoice: t("defaultVoice"),
+          voicesForLanguage: t("voicesForLanguage"),
+          otherVoices: t("otherVoices"),
+          noVoicesHint: t("noVoicesHint"),
         }}
       />
 

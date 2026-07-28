@@ -8,10 +8,12 @@ import {
   getPacingLabel,
   getStanzaCadences,
 } from "@/lib/cadence";
+import type { AppLanguage } from "@/lib/i18n/languages";
 import { VoiceReaderControls } from "./VoiceReaderControls";
 
 interface CadenceReaderProps {
   text: string;
+  language: AppLanguage;
   labels?: {
     title?: string;
     readAloud?: string;
@@ -23,10 +25,13 @@ interface CadenceReaderProps {
     unavailable?: string;
     stanza?: string;
     defaultVoice?: string;
+    voicesForLanguage?: string;
+    otherVoices?: string;
+    noVoicesHint?: string;
   };
 }
 
-export function CadenceReader({ text, labels = {} }: CadenceReaderProps) {
+export function CadenceReader({ text, language, labels = {} }: CadenceReaderProps) {
   const {
     bpm,
     setBpm,
@@ -34,14 +39,14 @@ export function CadenceReader({ text, labels = {} }: CadenceReaderProps) {
     setPitch,
     poeticPacing,
     setPoeticPacing,
-    voices,
+    voiceGroups,
     selectedVoiceURI,
     setSelectedVoiceURI,
     isPlaying,
     isSupported,
     speak,
     stop,
-  } = useCadenceReader();
+  } = useCadenceReader(language);
 
   const readingTime = formatReadingTime(estimateReadingTimeMs(text, bpm));
   const pacingLabel = getPacingLabel(bpm);
@@ -66,7 +71,8 @@ export function CadenceReader({ text, labels = {} }: CadenceReaderProps) {
             type="button"
             onClick={() => (isPlaying ? stop() : speak(text))}
             disabled={!text.trim()}
-            className="flex min-h-11 items-center gap-2 rounded-full bg-[var(--text)] px-4 py-2 text-xs text-[var(--bg)] transition-opacity hover:opacity-90 disabled:opacity-40 md:min-h-0"
+            className="flex min-h-11 items-center gap-2 rounded-full bg-[var(--text)] px-4 py-2 text-xs text-[var(--bg)] transition-opacity hover:opacity-90 disabled:opacity-40"
+            data-testid="cadence-play"
           >
             {isPlaying ? (
               <>
@@ -100,7 +106,7 @@ export function CadenceReader({ text, labels = {} }: CadenceReaderProps) {
         </label>
 
         <VoiceReaderControls
-          voices={voices}
+          voiceGroups={voiceGroups}
           selectedVoiceURI={selectedVoiceURI}
           onVoiceChange={setSelectedVoiceURI}
           pitch={pitch}
@@ -112,6 +118,9 @@ export function CadenceReader({ text, labels = {} }: CadenceReaderProps) {
             pitch: labels.pitch ?? "Pitch",
             poeticPacing: labels.poeticPacing ?? "Poetic pacing",
             defaultVoice: labels.defaultVoice ?? "Default",
+            voicesForLanguage: labels.voicesForLanguage,
+            otherVoices: labels.otherVoices,
+            noVoicesHint: labels.noVoicesHint,
           }}
         />
 
@@ -119,7 +128,8 @@ export function CadenceReader({ text, labels = {} }: CadenceReaderProps) {
           <div className="mt-3 space-y-1">
             {stanzas.map((s) => (
               <p key={s.index} className="text-[10px] text-[var(--muted)]">
-                {labels.stanza ?? "Stanza"} {s.index}: {s.lineCount} · {formatReadingTime(s.readingTimeMs)}
+                {labels.stanza ?? "Stanza"} {s.index}: {s.lineCount} ·{" "}
+                {formatReadingTime(s.readingTimeMs)}
               </p>
             ))}
           </div>
