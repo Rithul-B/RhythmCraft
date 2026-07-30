@@ -48,6 +48,16 @@ const BY_LANG: Record<AppLanguage, Replacer[]> = {
     [/\bpls\b/gi, "please"],
     [/\bw\/\b/gi, "with"],
     [/\bw\/o\b/gi, "without"],
+    [/\b(?:skibidi)\b/gi, "skibidi"],
+    [/\b(?:gyatt)\b/gi, "gyat"],
+    [/\b(?:delulu)\b/gi, "delusional"],
+    [/\b(?:rizz)\b/gi, "rizz"],
+    [/\b(?:sigma)\b/gi, "sigma"],
+    [/\b(?:bussin)\b/gi, "bussing"],
+    [/\b(?:fr fr)\b/gi, "for real for real"],
+    [/\b(?:say less)\b/gi, "say less"],
+    [/\b(?:deadass)\b/gi, "dead serious"],
+    [/\b(?:it's giving)\b/gi, "it's giving"],
   ],
   es: [
     [/\b(?:xq|xk|pq)\b/gi, "porque"],
@@ -96,6 +106,57 @@ const BY_LANG: Record<AppLanguage, Replacer[]> = {
     [/\b(?:boh)\b/gi, "boh"],
     [/\b(?:ahahah+)\b/gi, "ah ah ah"],
   ],
+  pt: [
+    [/\b(?:pq)\b/gi, "porque"],
+    [/\b(?:tb|tbm)\b/gi, "também"],
+    [/\b(?:vc)\b/gi, "você"],
+    [/\b(?:msg)\b/gi, "mensagem"],
+    [/\b(?:blz)\b/gi, "beleza"],
+    [/\b(?:vlw)\b/gi, "valeu"],
+    [/\b(?:tmj)\b/gi, "tamo junto"],
+    [/\b(?:kd)\b/gi, "cadê"],
+    [/\b(?:n|ñ)\b/gi, "não"],
+    [/\bhahaha+\b/gi, "ha ha ha"],
+  ],
+  nl: [
+    [/\b(?:ff)\b/gi, "even"],
+    [/\b(?:gwn)\b/gi, "gewoon"],
+    [/\b(?:idd)\b/gi, "inderdaad"],
+    [/\b(?:nvm)\b/gi, "maakt niet uit"],
+    [/\b(?:wrm)\b/gi, "waarom"],
+    [/\b(?:mss)\b/gi, "misschien"],
+    [/\b(?:omg)\b/gi, "oh mijn god"],
+    [/\b(?:lol)\b/gi, "ha ha"],
+    [/\b(?:sws)\b/gi, "sowieso"],
+  ],
+  pl: [
+    [/\b(?:np)\b/gi, "na przykład"],
+    [/\b(?:itd)\b/gi, "i tak dalej"],
+    [/\b(?:btw)\b/gi, "przy okazji"],
+    [/\b(?:omg)\b/gi, "o mój boże"],
+    [/\b(?:lol)\b/gi, "ha ha"],
+    [/\b(?:nwm)\b/gi, "nie wiem"],
+    [/\b(?:spoko)\b/gi, "spokojnie"],
+    [/\b(?:siema)\b/gi, "cześć"],
+  ],
+  ru: [
+    [/\b(?:спс|спсб)\b/gi, "спасибо"],
+    [/\b(?:пж|пжлст)\b/gi, "пожалуйста"],
+    [/\b(?:норм)\b/gi, "нормально"],
+    [/\b(?:чел)\b/gi, "человек"],
+    [/\b(?:лол)\b/gi, "ха ха"],
+    [/\b(?:имхо)\b/gi, "по моему мнению"],
+    [/\b(?:кста)\b/gi, "кстати"],
+  ],
+  sv: [
+    [/\b(?:asså|allså)\b/gi, "alltså"],
+    [/\b(?:typ)\b/gi, "typ"],
+    [/\b(?:ba)\b/gi, "bara"],
+    [/\b(?:omg)\b/gi, "herregud"],
+    [/\b(?:lol)\b/gi, "ha ha"],
+    [/\b(?:tjena)\b/gi, "hej"],
+    [/\b(?:fett)\b/gi, "fett"],
+  ],
 };
 
 /**
@@ -104,7 +165,6 @@ const BY_LANG: Record<AppLanguage, Replacer[]> = {
 export function normalizeTextForSpeech(text: string, language: AppLanguage): string {
   let out = text.replace(/\u00a0/g, " ");
 
-  // Soften common poetic separators into brief pauses the engine handles better.
   out = out.replace(/[—–]/g, ", ");
   out = out.replace(/\.{3,}/g, "…");
 
@@ -113,7 +173,6 @@ export function normalizeTextForSpeech(text: string, language: AppLanguage): str
     out = out.replace(pattern, replacement);
   }
 
-  // Collapse runaway spaces but preserve newlines for poetic chunking.
   out = out
     .split("\n")
     .map((line) => line.replace(/[ \t]{2,}/g, " ").trimEnd())

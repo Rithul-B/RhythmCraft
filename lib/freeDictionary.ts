@@ -41,12 +41,12 @@ function collectSynonyms(node: FreeDictSense | FreeDictEntry, into: Set<string>)
 }
 
 /**
- * Fetch synonyms for French / German / Italian via FreeDictionaryAPI.com
- * (Wiktionary-backed). Does not provide rhyme search.
+ * Fetch synonyms via FreeDictionaryAPI.com (Wiktionary-backed).
+ * Used for languages without Datamuse rhyme search. Does not provide rhymes.
  */
 export async function fetchFreeDictionarySynonyms(
   query: string,
-  lang: Extract<AppLanguage, "fr" | "de" | "it">,
+  lang: AppLanguage,
   signal?: AbortSignal
 ): Promise<WordResult[]> {
   const trimmed = query.trim();

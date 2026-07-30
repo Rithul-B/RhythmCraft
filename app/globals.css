@@ -137,3 +137,32 @@ a,
     --safe-top: env(safe-area-inset-top, 0px);
   }
 }
+
+/* Flip phones / tall handsets — keep chrome reachable, editor scrollable. */
+@media (max-width: 480px) and (min-height: 800px) {
+  .app-shell {
+    padding-bottom: max(0.25rem, env(safe-area-inset-bottom, 0px));
+  }
+}
+
+/* Foldables / tablets in split or landscape span — avoid cramped side panels. */
+@media (min-width: 600px) and (max-width: 1024px) {
+  .app-shell {
+    --editor-padding-x: 1.25rem;
+  }
+}
+
+/* Ultra-wide unfold / dual-pane: keep content from stretching endlessly. */
+@media (min-aspect-ratio: 18/9) and (min-width: 900px) {
+  .app-shell {
+    max-width: 100%;
+  }
+}
+
+/* CSS viewport segments (Samsung Fold / Surface Duo style). */
+@supports (width: env(viewport-segment-width 0 0)) {
+  .app-shell {
+    padding-left: max(0px, env(safe-area-inset-left, 0px));
+    padding-right: max(0px, env(safe-area-inset-right, 0px));
+  }
+}

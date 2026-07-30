@@ -43,7 +43,7 @@ export function SelectionPopover({
         if (!hasFullWordSearch(language)) {
           const synonyms = await fetchFreeDictionarySynonyms(
             word!,
-            language as "fr" | "de" | "it",
+            language,
             controller.signal
           );
           if (!controller.signal.aborted) {

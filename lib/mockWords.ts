@@ -38,6 +38,11 @@ const TONE_MOCK_WORDS: Record<string, DatamuseWord[]> = {
     { word: "rizz", numSyllables: 1, tags: [] },
     { word: "goated", numSyllables: 2, tags: [] },
     { word: "slay", numSyllables: 1, tags: [] },
+    { word: "sigma", numSyllables: 2, tags: [] },
+    { word: "delulu", numSyllables: 3, tags: [] },
+    { word: "aura", numSyllables: 2, tags: [] },
+    { word: "bet", numSyllables: 1, tags: [] },
+    { word: "cooked", numSyllables: 1, tags: [] },
   ],
 };
 

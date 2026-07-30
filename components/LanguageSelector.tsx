@@ -47,7 +47,7 @@ export function LanguageSelector({
 
       {open && (
         <div
-          className="absolute right-0 top-full z-50 mt-1 min-w-[180px] rounded-2xl border border-[var(--glass-border)] bg-[var(--glass-bg)] p-2 backdrop-blur-xl"
+          className="absolute right-0 top-full z-50 mt-1 max-h-[min(70vh,420px)] min-w-[180px] overflow-y-auto rounded-2xl border border-[var(--glass-border)] bg-[var(--glass-bg)] p-2 backdrop-blur-xl"
           style={{ boxShadow: "var(--shadow-soft)" }}
           role="listbox"
           aria-label={label}

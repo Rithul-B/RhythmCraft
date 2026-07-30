@@ -14,6 +14,11 @@ export const SPEECH_LANG_TAGS: Record<AppLanguage, string> = {
   fr: "fr-FR",
   de: "de-DE",
   it: "it-IT",
+  pt: "pt-PT",
+  nl: "nl-NL",
+  pl: "pl-PL",
+  ru: "ru-RU",
+  sv: "sv-SE",
 };
 
 /** Regional variants we actively surface for each app language. */
@@ -23,6 +28,11 @@ export const SPEECH_LOCALE_PREFIXES: Record<AppLanguage, string[]> = {
   fr: ["fr-fr", "fr-ca", "fr-be", "fr-ch", "fr"],
   de: ["de-de", "de-at", "de-ch", "de"],
   it: ["it-it", "it-ch", "it"],
+  pt: ["pt-pt", "pt-br", "pt"],
+  nl: ["nl-nl", "nl-be", "nl"],
+  pl: ["pl-pl", "pl"],
+  ru: ["ru-ru", "ru"],
+  sv: ["sv-se", "sv-fi", "sv"],
 };
 
 const QUALITY_BOOST = [
@@ -45,7 +55,10 @@ export function voiceMatchesLanguage(voiceLang: string, appLang: AppLanguage): b
   const normalized = normalizeLang(voiceLang);
   const prefixes = SPEECH_LOCALE_PREFIXES[appLang];
   return prefixes.some(
-    (prefix) => normalized === prefix || normalized.startsWith(`${prefix}-`) || normalized.startsWith(prefix)
+    (prefix) =>
+      normalized === prefix ||
+      normalized.startsWith(`${prefix}-`) ||
+      normalized.startsWith(prefix)
   );
 }
 
@@ -55,10 +68,8 @@ function qualityScore(voice: SpeechVoiceOption): number {
   for (const token of QUALITY_BOOST) {
     if (hay.includes(token)) score += 8;
   }
-  // Prefer exact regional tags over bare "es" / "fr".
   if (normalizeLang(voice.lang).includes("-")) score += 3;
-  if (voice.localService === false) score += 2; // often cloud/neural on Chromium
-  // Mild preference for female/male variety is not needed; keep stable.
+  if (voice.localService === false) score += 2;
   return score;
 }
 
@@ -66,7 +77,10 @@ function localeRank(voiceLang: string, appLang: AppLanguage): number {
   const normalized = normalizeLang(voiceLang);
   const prefixes = SPEECH_LOCALE_PREFIXES[appLang];
   const idx = prefixes.findIndex(
-    (prefix) => normalized === prefix || normalized.startsWith(`${prefix}-`) || normalized.startsWith(prefix)
+    (prefix) =>
+      normalized === prefix ||
+      normalized.startsWith(`${prefix}-`) ||
+      normalized.startsWith(prefix)
   );
   return idx === -1 ? 99 : idx;
 }
@@ -101,7 +115,7 @@ export interface VoiceGroup {
 }
 
 /**
- * For non-English: show every matching regional voice first (more options),
+ * For non-English: show every matching regional voice first,
  * then other system voices. English keeps a compact primary list.
  */
 export function groupVoicesForLanguage(
@@ -112,7 +126,6 @@ export function groupVoicesForLanguage(
   const primaryUris = new Set(primary.map((v) => v.voiceURI));
 
   if (appLang === "en") {
-    // Keep English list focused; still include strong regional accents.
     const compact = primary.slice(0, 12);
     const rest = allVoices
       .filter((v) => !compact.some((c) => c.voiceURI === v.voiceURI))
@@ -123,7 +136,6 @@ export function groupVoicesForLanguage(
     ];
   }
 
-  // Non-English: surface ALL matching locale voices (es-MX, es-AR, fr-CA, …).
   const other = allVoices
     .filter((v) => !primaryUris.has(v.voiceURI))
     .sort((a, b) => a.name.localeCompare(b.name));

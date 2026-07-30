@@ -85,15 +85,25 @@ export const TONE_DEFINITIONS: ToneDefinition[] = [
   },
   {
     id: "slang",
-    label: "Slang / Vernacular",
-    mlHints: "slang vernacular colloquial street talk",
+    label: "Gen Z / Beta",
+    mlHints: "gen z slang gen alpha vernacular internet speak colloquial",
     seeds: [
+      // Gen Z / millennial internet
       "lowkey", "highkey", "vibe", "vibes", "bet", "cap", "no cap", "rizz",
       "goated", "slay", "flex", "ghost", "ghosted", "sus", "mid", "fire",
       "lit", "salty", "shade", "tea", "stan", "simp", "yeet", "bruh",
       "finna", "gonna", "wanna", "aight", "dude", "bro", "fam", "cuz",
+      // Gen Alpha / “beta” brainrot wave
+      "sigma", "skibidi", "ohio", "gyatt", "delulu", "rizzler", "brainrot",
+      "aura", "cooked", "locked in", "ate", "ate that", "understood the assignment",
+      "it's giving", "main character", "side quest", "npc", "based", "cringe",
+      "ick", "situationship", "touch grass", "ratio", "w", "l", "bussin",
+      "sheesh", "periodt", "say less", "deadass", "fr fr", "on god",
+      // William’s way — plainspoken street vernacular
+      "real talk", "straight up", "for real", "word", "facts", "period",
+      "keep it a buck", "no lie", "say less", "we outside", "pull up",
     ],
-    demote: ["thee", "hath", "forsooth", "wherefore", "verily"],
+    demote: ["thee", "hath", "forsooth", "wherefore", "verily", "whilst", "whence"],
   },
 ];
 

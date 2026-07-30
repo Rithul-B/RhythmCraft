@@ -41,10 +41,9 @@ export function useWordSearch(language: AppLanguage = "en", debounceMs = 300) {
       setLoading(true);
       try {
         if (!hasFullWordSearch(language)) {
-          const lang = language as "fr" | "de" | "it";
           const synonyms = await fetchFreeDictionarySynonyms(
             debouncedQuery,
-            lang,
+            language,
             controller.signal
           );
           setResults(synonyms);

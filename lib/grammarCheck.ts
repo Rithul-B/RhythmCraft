@@ -20,6 +20,11 @@ const LANG_MAP: Record<AppLanguage, string> = {
   fr: "fr",
   de: "de-DE",
   it: "it",
+  pt: "pt-PT",
+  nl: "nl",
+  pl: "pl-PL",
+  ru: "ru-RU",
+  sv: "sv",
 };
 
 export function toLanguageToolCode(lang: AppLanguage): string {
